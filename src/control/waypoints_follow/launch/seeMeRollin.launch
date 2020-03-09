@@ -1,8 +1,18 @@
 <launch>
+
+    <!-- Drivers :  -->
+
     <node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="navsat" respawn="true">
         <param name="port" value="/dev/ttyUSB0" />
         <param name="baud" value="9600" />
     </node>
+
+    <node pkg="pwm_driver" type="pwm_arduino_serial_driver" name="pwm" respawn="true">
+        <param name="port" value="/dev/ttyUSB1" />
+        <param name="baud" value="9600" />
+    </node>
+
+    <!-- Localization :  -->
 
     <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" respawn="true">
 
@@ -15,5 +25,7 @@
         <remap from="/odometry/filtered" to="/your/robot_localization/output/topic" />
 
     </node>
+
+    <!-- Control :  -->
 
 </launch>
