@@ -12,16 +12,12 @@ double steering, speed;
 
 void steeringCallback(const std_msgs::Float64::ConstPtr &msg)
 {
-    // (ROS_DEBUG, ROS_WARN, ROS_FATAL, ... )
     steering = msg->data;
-    //ROS_INFO("I heard: [%f]", msg->angular.z);
 }
 
 void speedCallback(const std_msgs::Float64::ConstPtr &msg)
 {
-    // (ROS_DEBUG, ROS_WARN, ROS_FATAL, ... )
     speed = msg->data;
-    //ROS_INFO("I heard: [%f]", msg->angular.z);
 }
 
 int main(int argc, char **argv)
