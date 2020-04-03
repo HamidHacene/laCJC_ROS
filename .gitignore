@@ -50,3 +50,12 @@ qtcreator-*
 
 # Catkin custom files
 CATKIN_IGNORE
+
+#LaTEX
+docs/*.aux
+docs/*.fdb_latexmk
+docs/*.fls
+docs/*.log
+docs/*.out
+docs/*.synctex.gz
+docs/*.toc
