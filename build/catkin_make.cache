@@ -1,2 +1,0 @@
-
--DCATKIN_DEVEL_PREFIX=/home/zboubiteam/Documents/laCJC_ROS/devel -DCMAKE_INSTALL_PREFIX=/home/zboubiteam/Documents/laCJC_ROS/install -G Unix Makefiles
