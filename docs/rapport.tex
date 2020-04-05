@@ -95,24 +95,26 @@ Lorem ipsum dolor sit amet
 Lorem ipsum dolor sit amet
 
 \begin{lstlisting}
-          roslaunch TODO
+          roslaunch waypoints_follow seeMeRollin.launch
     \end{lstlisting}
 
 \subsection{Packages}
-Lorem ipsum dolor sit amet
-
 \subsubsection{Drivers}
-Lorem ipsum dolor sit amet
+Les drivers sont implémentés en utilisant le plus possible les nodes distribuées avec ROS. Le driver du GPS est celui du package \emph{nmea\_navsat\_driver} ;
+la node utilisée est \emph{nmea\_serial\_driver}. La node \emph{navsat\_transform\_node} du package \emph{robot\_localization} transforme alors la donnée
+issue du driver en une projection dans le repère du robot.
+
+Le package \emph{cv\_camera} nous permet de publier une image sur un topic ROS issue de la caméra de la Raspberry pi.
+
+Pour l'envoi de signaux $PWM$ vers l'ESC et le servo de direction, on a codé une node Python utilisant une bibliothèque pour contrôler la carte Maestro via
+la connexion série USB.
+
 
 \subsubsection{Traitement d'image}
 Lorem ipsum dolor sit amet
 
 \subsubsection{Contrôleur}
 Lorem ipsum dolor sit amet
-
-\subsubsection{Traitement d'image}
-Lorem ipsum dolor sit amet
-
 
 Exemple latex langage c :
 \begin{lstlisting}[language=C]
