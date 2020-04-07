@@ -1,15 +1,3 @@
-#include "opencv2/core/core.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-//#include "opencv2/imgcodecs.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "imgUtils.h"
-#include <iostream>
-#include <string>
-#include <math.h>
-
-using namespace cv;
-using namespace std;
-
 static void help(char **argv);
 //interest area
 const vector<Point2f> srcPts = {Point2f(320,190), 
@@ -29,8 +17,8 @@ const int colorMaxThreshold = 255;
 #define BIRDEYE_VIEW 0
 #define NORMAL_VIEW  1
 
-int frameWidth = 640;
-int frameHeight = 480;
+int frameWidth = 768;
+int frameHeight = 512;
 int alpha_ = 10, beta_ = 90, gamma_ = 90;
 int f_ = 746, dist_ = 450;
 Mat I = imread("../data/virageD.png", CV_LOAD_IMAGE_COLOR);
@@ -237,33 +225,9 @@ void postProcess()
 	destroyAllWindows();
 }
 
-//========================================================================
-int main(int argc, char **argv)
-{
-	help(argv);
-	//parameters();
-	postProcess();
-	/*
-	circle(I, srcPts[0], 10, CV_RGB(255,0,0));
-	circle(I, srcPts[1], 10, CV_RGB(0,255,0));
-	circle(I, srcPts[2], 10, CV_RGB(0,0,255));	
-	circle(I, srcPts[3], 10, CV_RGB(255,255,255));
-	*/
-
-	return EXIT_SUCCESS;
-}
-
-static void help(char **argv) 
-{
-	cout << endl
-		 << "This program demonstrated the use of the discrete Fourier transform (DFT). " << endl
-		 << "The dft of an image is taken and it's power spectrum is displayed." << endl << endl
-		 << "Usage:" << endl
-		 << argv[0] << " [image_name -- default lena.jpg]" << endl << endl;
-}
 
 
-/*vector<Point2f> compute4Pts_Transform(vector<Point2f> src)
+*vector<Point2f> compute4Pts_Transform(vector<Point2f> src)
 {	
 	Point2f tl = src[0], tr = src[1], bl = src[2], br = src[3];
 //compute the width of the new image	
@@ -320,3 +284,273 @@ Mat transformingView(Mat input, const int flag)
 	}
 	return output;
 }*/
+
+vector<Point2f> compute4Pts_Transform(vector<Point2f> src)
+{	
+	Point2f tl = src[0], tr = src[1], bl = src[2], br = src[3];
+//compute the width of the new image	
+	float widthA = sqrt( pow((br.x - bl.x),2) + pow((br.y - bl.y),2));
+	float widthB = sqrt( pow((tr.x - tl.x),2) + pow((tr.y - tl.y),2));
+	long int maxWidth = lroundf(fmaxf(widthA, widthB));
+	//cout << maxWidth << endl;
+//compute the height of the new image
+	float heightA = sqrt( pow((tr.x - br.x),2) + pow((tr.y - br.y),2));
+	float heightB = sqrt( pow((tl.x - bl.x),2) + pow((tl.y - bl.y),2));
+	long int maxHeight = lroundf(fmaxf(heightA , heightB));
+//construct the destPts
+	vector<Point2f> dest = {Point2f(0, 0), 
+							   Point2f(maxWidth-1, 0),
+							   Point2f(maxWidth-1, maxHeight-1), 
+							   Point2f(0, maxHeight-1)};
+	//cout << dest << endl;
+	return dest;
+}
+
+//========================================================================
+//===============Version Mardi 07/04======================================
+//========================================================================
+#include "opencv2/core/core.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+//#include "opencv2/imgcodecs.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include <iostream>
+#include <string>
+//#include <math.h>
+#include <vector>
+
+#include "imgUtils.h"
+#include "lane.hpp"
+
+using namespace cv;
+using namespace std;
+
+static void help(char **argv) 
+{
+	cout << endl
+		 << "This program demonstrated the use of the discrete Fourier transform (DFT). " << endl
+		 << "The dft of an image is taken and it's power spectrum is displayed." << endl << endl
+		 << "Usage:" << endl
+		 << argv[0] << " [image_name -- default lena.jpg]" << endl << endl;
+}
+//=============================================================================================
+#define BIRDEYE_VIEW 0
+#define NORMAL_VIEW  1
+
+int x0_=280,x1_=480,x2_=730,x3_=30,y0_=230,y1_=230,y2_=460,y3_=460;
+int frameWidth = 768;
+int frameHeight = 512;
+Mat s = imread("../data/image.png", CV_LOAD_IMAGE_COLOR), destination;
+Mat I = s.clone();
+vector<Point2f> srcPts = {Point2f(x0_,y0_), 
+						  Point2f(x1_,y1_),
+						  Point2f(x2_,y2_),
+						  Point2f(x3_,y3_)};
+
+Mat transformingView(Mat input, const int flag, vector<Point2f> src)
+{
+	//Change perspective from driver view to bird eye view	
+	//Param
+	//Input : Mat input image frame
+	//		  int flag = 0 for "BIRDEYE_VIEW" or 1 for "NORMAL_VIEW"
+	
+	//vector<Point2f> destPts = compute4Pts_Transform(src);
+	vector<Point2f> destPts = {Point2f(200, 0), 
+							   Point2f(500, 0),
+							   Point2f(500, 511), 
+							   Point2f(200, 511)};
+	Size warpSize(input.size());
+	Mat output(warpSize, input.type());
+	Mat transformationMatrix;
+	switch(flag)
+	{
+		case BIRDEYE_VIEW:
+			// Get Transformation Matrix
+			transformationMatrix = getPerspectiveTransform(src, destPts);
+			//Warping perspective
+			warpPerspective(input, output, transformationMatrix, warpSize, INTER_LINEAR, BORDER_CONSTANT);
+			break;
+		case NORMAL_VIEW:
+			transformationMatrix = getPerspectiveTransform(destPts, srcPts);
+			warpPerspective(input, output, transformationMatrix, warpSize,INTER_LINEAR);
+			break;
+		default:
+			cerr << "ERROR: FLAG ERROR\n";
+			break;
+	}
+	return output;
+}
+
+static void x0f(int, void*)
+{
+	I = s.clone();
+	vector<Point2f> srcPts = {Point2f(x0_,y0_), 
+							  Point2f(x1_,y1_),
+							  Point2f(x2_,y2_),
+							  Point2f(x3_,y3_)};
+	destination = transformingView(I, 0, srcPts);
+	for(int j=0; j<4; j++)
+	{
+		circle(I, srcPts[j], 10, CV_RGB(255,0,0));
+	}
+	imshow("Result", destination);
+	imshow("Im_source", I);
+}
+
+static void y0f(int, void*)
+{
+	I = s.clone();
+	vector<Point2f> srcPts = {Point2f(x0_,y0_), 
+							  Point2f(x1_,y1_),
+							  Point2f(x2_,y2_),
+							  Point2f(x3_,y3_)};
+	destination = transformingView(I, 0, srcPts);
+	for(int j=0; j<4; j++)
+	{
+		circle(I, srcPts[j], 10, CV_RGB(255,0,0));
+	}
+	imshow("Result", destination);
+	imshow("Im_source", I);
+}
+
+static void x1f(int, void*)
+{
+	I = s.clone();
+	vector<Point2f> srcPts = {Point2f(x0_,y0_), 
+							  Point2f(x1_,y1_),
+							  Point2f(x2_,y2_),
+							  Point2f(x3_,y3_)};
+	destination = transformingView(I, 0, srcPts);
+	for(int j=0; j<4; j++)
+	{
+		circle(I, srcPts[j], 10, CV_RGB(255,0,0));
+	}
+	imshow("Result", destination);
+	imshow("Im_source", I);
+}
+
+static void y1f(int, void*)
+{
+	I = s.clone();
+	vector<Point2f> srcPts = {Point2f(x0_,y0_), 
+							  Point2f(x1_,y1_),
+							  Point2f(x2_,y2_),
+							  Point2f(x3_,y3_)};
+	destination = transformingView(I, 0, srcPts);
+	for(int j=0; j<4; j++)
+	{
+		circle(I, srcPts[j], 10, CV_RGB(255,0,0));
+	}
+	imshow("Result", destination);
+	imshow("Im_source", I);
+}
+
+static void x2f(int, void*)
+{
+	I = s.clone();
+	vector<Point2f> srcPts = {Point2f(x0_,y0_), 
+							  Point2f(x1_,y1_),
+							  Point2f(x2_,y2_),
+							  Point2f(x3_,y3_)};
+	destination = transformingView(I, 0, srcPts);
+	for(int j=0; j<4; j++)
+	{
+		circle(I, srcPts[j], 10, CV_RGB(255,0,0));
+	}
+	imshow("Result", destination);
+	imshow("Im_source", I);
+}
+
+static void y2f(int, void*)
+{
+	I = s.clone();
+	vector<Point2f> srcPts = {Point2f(x0_,y0_), 
+							  Point2f(x1_,y1_),
+							  Point2f(x2_,y2_),
+							  Point2f(x3_,y3_)};
+	destination = transformingView(I, 0, srcPts);
+	for(int j=0; j<4; j++)
+	{
+		circle(I, srcPts[j], 10, CV_RGB(255,0,0));
+	}
+	imshow("Result", destination);
+	imshow("Im_source", I);
+}
+
+static void x3f(int, void*)
+{
+	I = s.clone();
+	vector<Point2f> srcPts = {Point2f(x0_,y0_), 
+							  Point2f(x1_,y1_),
+							  Point2f(x2_,y2_),
+							  Point2f(x3_,y3_)};
+	destination = transformingView(I, 0, srcPts);
+	for(int j=0; j<4; j++)
+	{
+		circle(I, srcPts[j], 10, CV_RGB(255,0,0));
+	}
+	imshow("Result", destination);
+	imshow("Im_source", I);
+}
+
+static void y3f(int, void*)
+{
+	I = s.clone();
+	vector<Point2f> srcPts = {Point2f(x0_,y0_), 
+							  Point2f(x1_,y1_),
+							  Point2f(x2_,y2_),
+							  Point2f(x3_,y3_)};
+	destination = transformingView(I, 0, srcPts);
+	for(int j=0; j<4; j++)
+	{
+		circle(I, srcPts[j], 10, CV_RGB(255,0,0));
+	}
+	imshow("Result", destination);
+	imshow("Im_source", I);
+}
+
+void birdView()
+{
+	namedWindow("Result", CV_WINDOW_AUTOSIZE );
+	namedWindow("Im_source", CV_WINDOW_AUTOSIZE );
+//Traitement
+	//trackbar
+	createTrackbar("x0"   , "Im_source", &x0_, frameWidth, x0f);
+	createTrackbar("y0"   , "Im_source", &y0_, frameHeight, y0f);
+	createTrackbar("x1"   , "Im_source", &x1_, frameWidth, x1f);
+	createTrackbar("y1"   , "Im_source", &y1_, frameHeight, y1f);
+	createTrackbar("x2"   , "Im_source", &x2_, frameWidth, x2f);
+	createTrackbar("y2"   , "Im_source", &y2_, frameHeight, y2f);
+	createTrackbar("x3"   , "Im_source", &x3_, frameWidth, x3f);
+	createTrackbar("y3"   , "Im_source", &y3_, frameHeight, y3f);
+	x0f(0,0);
+	y0f(0,0);
+	x1f(0,0);
+	y1f(0,0);
+	x2f(0,0);
+	y2f(0,0);
+	x3f(0,0);
+	y3f(0,0);
+	waitKey(0);
+	destroyAllWindows();
+}
+
+//=============================================================================================
+
+
+int main(int argc, char **argv)
+{
+	//help(argv);
+	birdView();
+	cout << "cc" << endl;
+	//parameters();
+	//postProcess();
+	/*
+	circle(I, srcPts[0], 10, CV_RGB(255,0,0));
+	circle(I, srcPts[1], 10, CV_RGB(0,255,0));
+	circle(I, srcPts[2], 10, CV_RGB(0,0,255));	
+	circle(I, srcPts[3], 10, CV_RGB(255,255,255));
+	*/
+
+	return EXIT_SUCCESS;
+}
+
