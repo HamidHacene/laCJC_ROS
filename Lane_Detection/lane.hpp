@@ -19,14 +19,14 @@ class lane
 public:
 	//Méthodes de classe
 	lane(const Mat s);
-	const Mat BirdEyeView();
-	const Mat transformingView(const Mat input, const int flag, const vector<Point2f> src);
 	const vector<Point2f> computeSrcROI();
-
+	const Mat transformingView(const Mat input, const int flag, const vector<Point2f> src);
+	void BirdEyeView();
+	void thresholdColChannel(int i = 1/*channel*/, const int s_thresh_min = 120, const int s_thresh_max = 255);
 
 	//Variables d'instance
 	int m_frameWidth = 0;
 	int m_frameHeight = 0;
-	Mat m_matSrc, m_BEV;
+	Mat m_matSrc, m_BEV, m_HSV;
 };
 #endif

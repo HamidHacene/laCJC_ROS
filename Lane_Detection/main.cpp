@@ -25,10 +25,16 @@ static void help(char **argv)
 //=============================================================================================
 int main(int argc, char **argv)
 {
-	Mat I = imread("../data/virageD.png", CV_LOAD_IMAGE_COLOR);
+	Mat I = imread("../data/image.png", CV_LOAD_IMAGE_COLOR);
 	lane L(I);
+
+	L.BirdEyeView();
+	L.thresholdColChannel();
+
 	imshow("Im_source", L.m_matSrc);
-	imshow("Bird Eye View", L.BirdEyeView());
+	imshow("Bird Eye View", L.m_BEV);
+	imshow("Thresh", L.m_HSV);
+
 	waitKey(0);
 	destroyAllWindows();	
 	return EXIT_SUCCESS;

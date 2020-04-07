@@ -55,9 +55,20 @@ const Mat lane::transformingView(const Mat input, const int flag, const vector<P
 	return output;
 }
 
-const Mat lane::BirdEyeView()
+void lane::BirdEyeView()
 {
 	vector<Point2f> srcPts = computeSrcROI();
 	m_BEV = transformingView(m_matSrc, 0, srcPts);
-	return m_BEV;
 }
+
+void lane::thresholdColChannel(int i, int s_thresh_min, int s_thresh_max)
+{
+	cvtColor(m_BEV, m_HSV, COLOR_BGR2HSV);
+
+	vector<Mat> HSV_channels(3);
+	split(m_HSV, HSV_channels);
+
+	threshold(HSV_channels[1], HSV_channels[1], 120 , 255 , THRESH_OTSU);
+	merge(HSV_channels, m_HSV);
+}
+
