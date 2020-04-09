@@ -63,12 +63,21 @@ void lane::BirdEyeView()
 
 void lane::thresholdColChannel(int i, int s_thresh_min, int s_thresh_max)
 {
+	//detection of the left line
 	cvtColor(m_BEV, m_HSV, COLOR_BGR2HSV);
-
 	vector<Mat> HSV_channels(3);
 	split(m_HSV, HSV_channels);
-
-	threshold(HSV_channels[1], HSV_channels[1], 120 , 255 , THRESH_OTSU);
+	threshold(HSV_channels[i], HSV_channels[i], s_thresh_min , s_thresh_max , THRESH_OTSU);
+	threshold(HSV_channels[i], m_HSV, s_thresh_min , s_thresh_max , THRESH_OTSU);
 	merge(HSV_channels, m_HSV);
 }
+
+/*void lane::findEdges()
+{
+	BirdEyeView();
+	thresholdColChannel(i, 120, 255);
+
+}*/
+
+
 

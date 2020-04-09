@@ -30,10 +30,13 @@ int main(int argc, char **argv)
 
 	L.BirdEyeView();
 	L.thresholdColChannel();
+	Mat bin;
+	cvtColor(L.m_HSV, bin, COLOR_HSV2BGR);
 
 	imshow("Im_source", L.m_matSrc);
 	imshow("Bird Eye View", L.m_BEV);
 	imshow("Thresh", L.m_HSV);
+	imshow("Binary_Thresh", bin);
 
 	waitKey(0);
 	destroyAllWindows();	
