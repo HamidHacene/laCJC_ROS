@@ -22,7 +22,7 @@ public:
 	const vector<Point2f> computeSrcROI();
 	const Mat transformingView(const Mat input, const int flag, const vector<Point2f> src);
 	void BirdEyeView();
-	void thresholdColChannel(int i = 1/*channel*/, const int s_thresh_min = 120, const int s_thresh_max = 255);
+	Mat thresholdColChannel(int i = 1/*channel*/, const int s_thresh_min = 120, const int s_thresh_max = 255);
 
 	//Variables d'instance
 	int m_frameWidth = 0;

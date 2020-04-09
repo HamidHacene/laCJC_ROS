@@ -6,7 +6,7 @@ using namespace cv;
 #define BIRDEYE_VIEW 0
 #define NORMAL_VIEW  1
 
-lane::lane(const Mat s): m_frameWidth(s.rows), m_frameHeight(s.cols), m_matSrc(s.clone())
+lane::lane(const Mat s): m_frameWidth(s.cols), m_frameHeight(s.rows), m_matSrc(s.clone())
 {
 	//Init
 }
@@ -61,15 +61,16 @@ void lane::BirdEyeView()
 	m_BEV = transformingView(m_matSrc, 0, srcPts);
 }
 
-void lane::thresholdColChannel(int i, int s_thresh_min, int s_thresh_max)
+Mat lane::thresholdColChannel(int i, int s_thresh_min, int s_thresh_max)
 {
 	//detection of the left line
 	cvtColor(m_BEV, m_HSV, COLOR_BGR2HSV);
 	vector<Mat> HSV_channels(3);
 	split(m_HSV, HSV_channels);
 	threshold(HSV_channels[i], HSV_channels[i], s_thresh_min , s_thresh_max , THRESH_OTSU);
-	threshold(HSV_channels[i], m_HSV, s_thresh_min , s_thresh_max , THRESH_OTSU);
-	merge(HSV_channels, m_HSV);
+	//threshold(HSV_channels[i], m_HSV, s_thresh_min , s_thresh_max , THRESH_OTSU);
+	//merge(HSV_channels, m_HSV);
+	return HSV_channels[i];
 }
 
 /*void lane::findEdges()
