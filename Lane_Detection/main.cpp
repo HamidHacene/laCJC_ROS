@@ -9,6 +9,12 @@
 
 #include "imgUtils.h"
 #include "lane.hpp"
+//=============================
+#include "xtensor/xarray.hpp"
+#include "xtensor/xio.hpp"
+#include "xtensor/xview.hpp"
+//=============================
+
 
 using namespace cv;
 using namespace std;
