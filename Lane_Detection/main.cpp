@@ -39,6 +39,7 @@ int main(int argc, char **argv)
 	lane L(I);
 
 	L.processFrame();
+	imwrite("../data/BEV.png", L.m_BEV);
 	imshow("Im_source", L.m_matSrc);
 	imshow("Bird Eye View", L.m_BEV);
 	waitKey(0);

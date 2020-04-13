@@ -192,6 +192,7 @@ xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> plot
 		circle(RoIcol, zz, 1, CV_RGB(255,0,0));
 	}
 	imshow("RoI", RoIcol);
+	imwrite("../data/fit.png", RoIcol);
 	return left_fitx; //X = aY² + bY + c
 }
 
