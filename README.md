@@ -1,8 +1,11 @@
 # laCJC_ROS
 ## Installation des librairies pour "TNI"
+
 <p align="center">
 xtensor : 
+ 
   * Download zip from : https://github.com/xtensor-stack/xtensor
+ 
   * Extract files and open a trminal in the folder : 
   ```bash
     $ mkdir build 
@@ -12,5 +15,6 @@ xtensor :
     $ cd ../..
     $ rm -r xtensor-master
   ```
+  
 </p>
 
