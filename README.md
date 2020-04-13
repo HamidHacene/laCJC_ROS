@@ -9,7 +9,7 @@
     $ mkdir build 
     $ cd build
     $ cmake -D CMAKE_INSTALL_PREFIX=/usr/local ..
-    $ make install
+    $ sudo make install
     $ cd ../..
     $ rm -r xtensor-master
   ```
@@ -23,7 +23,7 @@
     $ mkdir build 
     $ cd build
     $ cmake -D CMAKE_INSTALL_PREFIX=/usr/local ..
-    $ make install
+    $ sudo make install
     $ cd ../..
     $ rm -r xtensor-master
   ```
@@ -37,7 +37,7 @@
     $ mkdir build 
     $ cd build
     $ cmake -D CMAKE_INSTALL_PREFIX=/usr/local ..
-    $ make install
+    $ sudo make install
     $ cd ../..
     $ rm -r xtensor-master
   ```
