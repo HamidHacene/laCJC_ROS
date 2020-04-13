@@ -1,6 +1,6 @@
 # laCJC_ROS
 ## Installation des librairies pour "TNI"
-######xtensor : 
+###### xtensor : 
  
   * Download zip from : https://github.com/xtensor-stack/xtensor
  
@@ -14,7 +14,7 @@
     $ rm -r xtensor-master
   ```
 
-######xtensor-blas : 
+###### xtensor-blas : 
  
   * Download zip from : https://github.com/xtensor-stack/xtensor-blas
  
@@ -28,7 +28,7 @@
     $ rm -r xtensor-master
   ```
 
-######xtl : 
+###### xtl : 
  
   * Download zip from : https://github.com/xtensor-stack/xtl
  
