@@ -4,7 +4,7 @@
  
   * Download zip from : https://github.com/xtensor-stack/xtensor
  
-  * Extract files and open a trminal in the folder : 
+  * Extract files and open a terminal in the extracted folder : 
   ```bash
     $ mkdir build 
     $ cd build
@@ -18,7 +18,7 @@
  
   * Download zip from : https://github.com/xtensor-stack/xtensor-blas
  
-  * Extract files and open a trminal in the folder : 
+  * Extract files and open a terminal in the extracted folder : 
   ```bash
     $ mkdir build 
     $ cd build
@@ -32,7 +32,7 @@
  
   * Download zip from : https://github.com/xtensor-stack/xtl
  
-  * Extract files and open a trminal in the folder : 
+  * Extract files and open a terminal in the extracted folder : 
   ```bash
     $ mkdir build 
     $ cd build
