@@ -25,7 +25,6 @@
     $ cmake -D CMAKE_INSTALL_PREFIX=/usr/local ..
     $ sudo make install
     $ cd ../..
-    $ rm -r xtensor-master
   ```
 
 ###### xtl : 
@@ -39,7 +38,6 @@
     $ cmake -D CMAKE_INSTALL_PREFIX=/usr/local ..
     $ sudo make install
     $ cd ../..
-    $ rm -r xtensor-master
   ```
 ## Lane detection
 
