@@ -1,5 +1,21 @@
 # laCJC_ROS
 ## Installation des librairies pour "TNI"
+
+
+###### xtl : 
+ 
+  * Download zip from : https://github.com/xtensor-stack/xtl
+ 
+  * Extract files and open a terminal in the extracted folder : 
+  ```bash
+    $ mkdir build 
+    $ cd build
+    $ cmake -D CMAKE_INSTALL_PREFIX=/usr/local ..
+    $ sudo make install
+    $ cd ../..
+  ```
+
+
 ###### xtensor : 
  
   * Download zip from : https://github.com/xtensor-stack/xtensor
@@ -27,18 +43,7 @@
     $ cd ../..
   ```
 
-###### xtl : 
- 
-  * Download zip from : https://github.com/xtensor-stack/xtl
- 
-  * Extract files and open a terminal in the extracted folder : 
-  ```bash
-    $ mkdir build 
-    $ cd build
-    $ cmake -D CMAKE_INSTALL_PREFIX=/usr/local ..
-    $ sudo make install
-    $ cd ../..
-  ```
+
   ###### openBlas : 
 
   ```
