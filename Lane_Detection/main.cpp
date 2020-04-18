@@ -31,12 +31,10 @@ static void help(char **argv)
 		 << argv[0] << " [image_name -- default lena.jpg]" << endl << endl;
 }
 
-
-
 //=============================================================================================
 int main(int argc, char **argv)
 {
-	Mat I = imread("../data/image.png", CV_LOAD_IMAGE_COLOR);
+	Mat I = imread("../data/virageG.png", CV_LOAD_IMAGE_COLOR);
 	lane L(I);
 
 	L.processFrame();
