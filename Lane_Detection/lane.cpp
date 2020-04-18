@@ -198,7 +198,7 @@ xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> plot
 	return left_fitx; //left_fitx = aY² + bY + c
 }
 
-void lane::computeLaneCurvature(const xt::xarray<double> ploty, const xt::xarray<double> leftx)
+void lane::computeLaneCurvature(const xt::xarray<double> ploty, const xt::xarray<double> leftx, const xt::xarray<double> rightx)
 {
 //Choose maximum y-value --> bottom of the image
 	xt::xarray<double> y_eval = xt::amax(ploty);
@@ -209,9 +209,13 @@ void lane::computeLaneCurvature(const xt::xarray<double> ploty, const xt::xarray
 //polyfit in world space
 	xt::xarray<double> tmp1 = ym_per_pix*ploty;
 	xt::xarray<double> tmp2 = xm_per_pix*leftx;
+	xt::xarray<double> tmp3 = xm_per_pix*rightx;
 	xt::xarray<double> left_fit_cr = polyfit2D(tmp1, tmp2);
+	xt::xarray<double> right_fit_cr = polyfit2D(tmp1, tmp3);
 //Compute radius of curvature in meters : R = ((1+(2Ay+B)²)^(3/2))/(|2A|)
 	m_leftCurveRad = pow((1 + pow(2*left_fit_cr(0)*y_eval*ym_per_pix + left_fit_cr(1),2)),1.5)/abs(2*left_fit_cr(0));
+	m_rightCurveRad = pow((1 + pow(2*right_fit_cr(0)*y_eval*ym_per_pix + right_fit_cr(1),2)),1.5)/abs(2*right_fit_cr(0));
+	m_curveRad = (m_leftCurveRad+m_rightCurveRad)/2;
 //Find curve direction
 	if((leftx(0) - leftx(leftx.size()-1)) > 28)
 	{
@@ -236,8 +240,6 @@ Mat lane::thresholdRight()
 	int Rmin = 137, Gmin = 163, Bmin = 157;
 	int Rmax = 175, Gmax = 255, Bmax = 238;
 	inRange(m_BEV, Scalar(Rmin, Gmin, Bmin), Scalar(Rmax, Gmax, Bmax), bin);
-	imshow("bin", bin);
-	imshow("m_BEV", m_BEV);
 	return bin;
 }
 
@@ -263,9 +265,8 @@ void lane::processFrame()
 	m_ploty = xt::linspace<double>(0, ROIR.rows-1, ROIR.rows);
 	xt::xarray<double> left_fitx = fullSearch(ROIL, m_ploty, "ROIL");
 	xt::xarray<double> right_fitx = fullSearch(ROIR, m_ploty, "ROIR");
-//To do --> right_fitx
 //Compute lane curvature
-	computeLaneCurvature(m_ploty, left_fitx);
+	computeLaneCurvature(m_ploty, left_fitx, right_fitx);
 }
 
 /*
@@ -278,6 +279,3 @@ $export BLAS=/path/to/libopenblas.a
 
 
 */
-
-
-
