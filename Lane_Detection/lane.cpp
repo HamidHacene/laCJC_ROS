@@ -187,6 +187,14 @@ xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> plot
 	leftx.reshape({n});
 	int yb = RoI.rows;
 	int xb = max_loc.x;
+	if(s0=="ROIL")
+	{
+		m_bottom_l = xb ;
+	}
+	else
+	{
+		m_bottom_r = xb;
+	}
 	auto left_fitx = left_fit(0)*(xt::pow(ploty, 2)) + left_fit(1)*ploty + left_fit(2);
 	for(int j=0; j<n; j++)
 	{
@@ -203,7 +211,6 @@ void lane::computeLaneCurvature(const xt::xarray<double> ploty, const xt::xarray
 //Choose maximum y-value --> bottom of the image
 	xt::xarray<double> y_eval = xt::amax(ploty);
 //Conversion in x & y from pixels -> meters
-	double LANEWIDTH = 3.75;  //lane width --> to check
 	double ym_per_pix = 7./m_frameHeight;
 	double xm_per_pix = LANEWIDTH/m_frameWidth;
 //polyfit in world space
@@ -243,6 +250,26 @@ Mat lane::thresholdRight()
 	return bin;
 }
 
+double lane::computeCarOffcenter(const xt::xarray<double> leftx, const xt::xarray<double> rightx)
+{
+	double bottom_l = m_bottom_l; //m_frameWidth/2 - leftx(leftx.size()-1);
+	double bottom_r = m_bottom_r + m_frameWidth/2; //rightx(rightx.size()-1) + m_frameWidth/2;
+	double mid = m_frameWidth/2;
+	double a = mid - bottom_l;
+	double b = bottom_r - mid;
+	double width = bottom_r - bottom_l;
+	double offset;
+	if (a >= b)
+	{
+		offset = a/width*LANEWIDTH-LANEWIDTH/2.0;
+	}
+	else
+	{
+		offset = LANEWIDTH/2.0-b/width*LANEWIDTH;
+	}
+	return offset;
+}
+
 void lane::processFrame()
 {
 //Build Bird Eye View
@@ -267,15 +294,11 @@ void lane::processFrame()
 	xt::xarray<double> right_fitx = fullSearch(ROIR, m_ploty, "ROIR");
 //Compute lane curvature
 	computeLaneCurvature(m_ploty, left_fitx, right_fitx);
+//Compute car offcenter
+	m_offCenter = computeCarOffcenter(left_fitx, right_fitx);
 }
 
 /*
 Next steps : 
-	* compute car's off-center distance;
 	* build visualisation;
-$sudo apt-get install libopenblas-dev
-$export LD_LIBRARY_PATH=/path/to/OpenBLAS:$LD_LIBRARY_PATHA
-$export BLAS=/path/to/libopenblas.a
-
-
 */
