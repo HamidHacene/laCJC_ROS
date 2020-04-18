@@ -40,7 +40,7 @@ int main(int argc, char **argv)
 	lane L(I);
 
 	L.processFrame();
-	cout << "Left curve radius = " << L.m_leftCurveRad << endl;
+	cout << "Left curve radius = " << L.m_curveRad << endl;
 	cout << "Curve direction = " << L.m_curveDir << endl;	
 	//imwrite("../data/BEV.png", L.m_BEV);
 	imshow("Im_source", L.m_matSrc);
