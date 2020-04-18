@@ -34,9 +34,9 @@ static void help(char **argv)
 //=============================================================================================
 int main(int argc, char **argv)
 {
-	Mat I = imread("../data/virageG.png", CV_LOAD_IMAGE_COLOR);
+	
+	Mat I = imread("../data/test_offD.png", CV_LOAD_IMAGE_COLOR);
 	lane L(I);
-
 	L.processFrame();
 	cout << "Left curve radius = " << L.m_curveRad << endl;
 	cout << "Curve direction = " << L.m_curveDir << endl;

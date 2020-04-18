@@ -36,7 +36,8 @@ public:
 	xt::xarray<double> fullSearch(const Mat RoI, const xt::xarray<double> ploty, const string s0);
 	void computeLaneCurvature(const xt::xarray<double> ploty, const xt::xarray<double> leftx, const xt::xarray<double> rightx);
 	Mat thresholdRight();
-	double computeCarOffcenter(const xt::xarray<double> leftx, const xt::xarray<double> rightx);
+	double computeCarOffcenter(const xt::xarray<double> leftx, const double mid, const xt::xarray<double> rightx);
+	double computeMid(const Mat M, const Mat templ);
 	void processFrame();
 
 	//Variables d'instance
@@ -45,9 +46,10 @@ public:
 	int m_bottom_l, m_bottom_r;
 	double LANEWIDTH = 3.75;
 	Mat m_matSrc, m_BEV, m_HSV;
+	Mat m_transformationMatrix, m_tpl;
 	xt::xarray<double> m_ploty;
 	xt::xarray<double> m_leftCurveRad, m_rightCurveRad, m_curveRad;
 	int m_curveDir;
-	double m_offCenter;
+	double m_offCenter, m_mid;
 };
 #endif

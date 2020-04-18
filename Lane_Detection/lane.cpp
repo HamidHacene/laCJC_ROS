@@ -17,7 +17,7 @@ using namespace cv;
 
 lane::lane(const Mat s): m_frameWidth(s.cols), m_frameHeight(s.rows), m_matSrc(s.clone())
 {
-	//Init
+	m_tpl = imread("../data/body.png", CV_LOAD_IMAGE_COLOR);
 }
 
 const vector<Point2f> lane::computeSrcROI()
@@ -44,18 +44,17 @@ const Mat lane::transformingView(const Mat input, const int flag, const vector<P
 							   Point2f(200, 511)};
 	Size warpSize(input.size());
 	Mat output(warpSize, input.type());
-	Mat transformationMatrix;
 	switch(flag)
 	{
 		case BIRDEYE_VIEW:
 			// Get Transformation Matrix
-			transformationMatrix = getPerspectiveTransform(src, destPts);
+			m_transformationMatrix = getPerspectiveTransform(src, destPts);
 			//Warping perspective
-			warpPerspective(input, output, transformationMatrix, warpSize, INTER_LINEAR, BORDER_CONSTANT);
+			warpPerspective(input, output, m_transformationMatrix, warpSize, INTER_LINEAR, BORDER_CONSTANT);
 			break;
 		case NORMAL_VIEW:
-			transformationMatrix = getPerspectiveTransform(destPts, src);
-			warpPerspective(input, output, transformationMatrix, warpSize,INTER_LINEAR);
+			m_transformationMatrix = getPerspectiveTransform(destPts, src);
+			warpPerspective(input, output, m_transformationMatrix, warpSize,INTER_LINEAR);
 			break;
 		default:
 			cerr << "ERROR: FLAG ERROR\n";
@@ -250,15 +249,25 @@ Mat lane::thresholdRight()
 	return bin;
 }
 
-double lane::computeCarOffcenter(const xt::xarray<double> leftx, const xt::xarray<double> rightx)
+double lane::computeCarOffcenter(const xt::xarray<double> leftx, const double mid, const xt::xarray<double> rightx)
 {
 	double bottom_l = m_bottom_l; //m_frameWidth/2 - leftx(leftx.size()-1);
 	double bottom_r = m_bottom_r + m_frameWidth/2; //rightx(rightx.size()-1) + m_frameWidth/2;
-	double mid = m_frameWidth/2;
 	double a = mid - bottom_l;
 	double b = bottom_r - mid;
 	double width = bottom_r - bottom_l;
 	double offset;
+
+	circle(m_BEV, Point(bottom_l, 500), 5, CV_RGB(255,0,0));
+	circle(m_BEV, Point(bottom_r, 500), 5, CV_RGB(0,255,0));
+	circle(m_BEV, Point(mid, 500), 5, CV_RGB(0,0,255));
+
+	std::cout << " m_mid = " << mid << std::endl;
+	std::cout << " bottom_l = " << bottom_l << std::endl;
+	std::cout << " bottom_r = " << bottom_r << std::endl;
+	std::cout << " a = " << a << std::endl;
+	std::cout << " b = " << b << std::endl;
+	std::cout << " width = " << width << std::endl;
 	if (a >= b)
 	{
 		offset = a/width*LANEWIDTH-LANEWIDTH/2.0;
@@ -268,6 +277,35 @@ double lane::computeCarOffcenter(const xt::xarray<double> leftx, const xt::xarra
 		offset = LANEWIDTH/2.0-b/width*LANEWIDTH;
 	}
 	return offset;
+}
+
+double lane::computeMid(const Mat M, const Mat templ)
+{
+	Mat img_display, result;
+	//M.copyTo(img_display);
+	result.create(M.cols-templ.cols+1, M.rows-templ.rows+1, CV_32FC1);
+	matchTemplate(M, templ, result, 3);
+	normalize(result, result, 0, 1, NORM_MINMAX, -1, Mat());
+	double minVal; double maxVal; Point minLoc; Point maxLoc;
+	minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, Mat());
+	//circle(img_display, Point(maxLoc.x+templ.cols/2, maxLoc.y), 5, CV_RGB(255,0,255));
+	//circle(img_display, Point(maxLoc.x+templ.cols/2, maxLoc.y+templ.rows), 5, CV_RGB(255,0,0));
+	//rectangle(img_display, maxLoc, Point(maxLoc.x+templ.cols, maxLoc.y+templ.rows), Scalar::all(0), 2, 8, 0);	
+	//imshow("image_window", img_display);
+	double x0 = maxLoc.x + templ.cols/2, y0 = maxLoc.y+templ.rows;
+	vector<Point2f> srcPts = computeSrcROI();
+	Mat ss = transformingView(m_BEV, 1, srcPts);
+	xt::xarray<double> mInv = xt::zeros<double>({3,3});	
+	for (int i=0; i<3; i++) 
+	{
+		for(int j=0; j<3; j++)
+		{
+			mInv(i,j) = m_transformationMatrix.at<double>(i,j);
+		}
+	}
+	mInv = xt::linalg::inv(mInv);
+	int xn1 = (mInv(0,0)*x0 + mInv(0,1)*y0 + mInv(0,2))/(mInv(2,0)*x0 + mInv(2,1)*y0 + mInv(2,2));
+	return xn1;
 }
 
 void lane::processFrame()
@@ -295,7 +333,8 @@ void lane::processFrame()
 //Compute lane curvature
 	computeLaneCurvature(m_ploty, left_fitx, right_fitx);
 //Compute car offcenter
-	m_offCenter = computeCarOffcenter(left_fitx, right_fitx);
+	double midl = computeMid(m_matSrc, m_tpl);
+	m_offCenter = computeCarOffcenter(left_fitx, midl, right_fitx);
 }
 
 /*
