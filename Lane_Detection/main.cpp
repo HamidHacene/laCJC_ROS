@@ -36,7 +36,7 @@ static void help(char **argv)
 //=============================================================================================
 int main(int argc, char **argv)
 {
-	Mat I = imread("../data/virageG.png", CV_LOAD_IMAGE_COLOR);
+	Mat I = imread("../data/virageD.png", CV_LOAD_IMAGE_COLOR);
 	lane L(I);
 
 	L.processFrame();

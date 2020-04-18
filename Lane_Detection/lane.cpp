@@ -25,10 +25,10 @@ const vector<Point2f> lane::computeSrcROI()
 	//Defining the ROI points
 	int x0_=280,x1_=480,x2_=730,x3_=30;
 	int y0_=230,y1_=230,y2_=460,y3_=460;
-	vector<Point2f> srcPts = {Point2f(x0_,y0_), 
+	vector<Point2f> srcPts = {Point2f(x0_,y0_),
 						  Point2f(x1_,y1_),
 						  Point2f(x2_,y2_),
-						  Point2f(x3_,y3_)};	
+						  Point2f(x3_,y3_)};
 	return srcPts;
 }
 
@@ -231,9 +231,13 @@ Mat lane::thresholdRight()
 {
 	//detection of the left line
 	Mat bin;
-	cvtColor(m_BEV, bin, COLOR_BGR2GRAY);
-	threshold(bin, bin, 180, 255, THRESH_OTSU);
-	imshow("test", bin);	
+	//cvtColor(m_BEV, bin, COLOR_BGR2GRAY);
+	const int max_value = 255;
+	int Rmin = 137, Gmin = 163, Bmin = 157;
+	int Rmax = 175, Gmax = 255, Bmax = 238;
+	inRange(m_BEV, Scalar(Rmin, Gmin, Bmin), Scalar(Rmax, Gmax, Bmax), bin);
+	imshow("bin", bin);
+	imshow("m_BEV", m_BEV);
 	return bin;
 }
 
