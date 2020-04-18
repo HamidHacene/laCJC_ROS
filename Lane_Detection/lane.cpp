@@ -1,6 +1,7 @@
 #include "imgUtils.h"
 #include "lane.hpp"
 #include <vector>
+//#include <cmath>
 //=============================
 #include "xtensor/xarray.hpp"
 #include "xtensor/xio.hpp"
@@ -80,7 +81,7 @@ Mat lane::thresholdColChannel(int i, int s_thresh_min, int s_thresh_max)
 	return HSV_channels[i];
 }
 
-xt::xarray<double> lane::polyfit2D(xt::xarray<int> &xValues, xt::xarray<int> &yValues)
+xt::xarray<double> lane::polyfit2D(xt::xarray<double> &xValues, xt::xarray<double> &yValues)
 {
 	int n = xValues.size();
 	xValues.reshape({n,1});
@@ -88,7 +89,7 @@ xt::xarray<double> lane::polyfit2D(xt::xarray<int> &xValues, xt::xarray<int> &yV
 	xt::xarray<double> x2 = xt::pow(xValues, 2);
 	xt::xarray<double> x0 = xt::ones<double>({n,1});
 	xt::xarray<double> A = xt::hstack(xt::xtuple(x2, xValues, x0));
-	xt::xarray<int> At = xt::zeros<double>({3,n});
+	xt::xarray<double> At = xt::zeros<double>({3,n});
 	for(int i=0; i<n; i++)
 	{
 		for (int j = 0; j < 3; j++)
@@ -175,8 +176,8 @@ xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> plot
 		good_left_inds.clear();
 	}
 //Extract left line pixel positions
-	xt::xarray<int> leftx = xt::index_view(nonZeroX, left_lane_inds);
-	xt::xarray<int> lefty = xt::index_view(nonZeroY, left_lane_inds);
+	xt::xarray<double> leftx = xt::index_view(nonZeroX, left_lane_inds);
+	xt::xarray<double> lefty = xt::index_view(nonZeroY, left_lane_inds);
 //Compute the polynomial coefficient to fit with the line (2deg pol : ay^² + by + c)
 	xt::xarray<double> left_fit = polyfit2D(lefty, leftx);
 //Visualize the line
@@ -193,7 +194,36 @@ xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> plot
 	}
 	imshow("RoI", RoIcol);
 	imwrite("../data/fit.png", RoIcol);
-	return left_fitx; //X = aY² + bY + c
+	return left_fitx; //left_fitx = aY² + bY + c
+}
+
+void lane::computeLaneCurvature(const xt::xarray<double> ploty, const xt::xarray<double> leftx)
+{
+//Choose maximum y-value --> bottom of the image
+	xt::xarray<double> y_eval = xt::amax(ploty);
+//Conversion in x & y from pixels -> meters
+	double LANEWIDTH = 3.75;  //lane width --> to check
+	double ym_per_pix = 7./m_frameHeight;
+	double xm_per_pix = LANEWIDTH/m_frameWidth;
+//polyfit in world space
+	xt::xarray<double> tmp1 = ym_per_pix*ploty;
+	xt::xarray<double> tmp2 = xm_per_pix*leftx;
+	xt::xarray<double> left_fit_cr = polyfit2D(tmp1, tmp2);
+//Compute radius of curvature in meters : R = ((1+(2Ay+B)²)^(3/2))/(|2A|)
+	m_leftCurveRad = pow((1 + pow(2*left_fit_cr(0)*y_eval*ym_per_pix + left_fit_cr(1),2)),1.5)/abs(2*left_fit_cr(0));
+//Find curve direction
+	if((leftx(0) - leftx(leftx.size()-1)) > 28)
+	{
+		m_curveDir| = -1;
+	}
+	else if((leftx(leftx.size()-1) - leftx(0)) > 28)
+	{
+		m_curveDir = 1;
+	}
+	else
+	{
+		m_curveDir = 0;
+	}
 }
 
 void lane::processFrame()
@@ -202,21 +232,30 @@ void lane::processFrame()
 	BirdEyeView();
 //Apply a thresh on S channel
 	Mat S = thresholdColChannel();
-//Select the appropriate ROI (here we oonly select the left one)
-//To use the right line, a more accurate filter is needed to extract the line !
-//Need improvements ! 
+//Select the appropriate ROI (here we only select the left one)
+//-->Left ROI
 	int x0 = 0, y0 = m_frameHeight/2, w0 = m_frameWidth/2 , h0 = m_frameHeight/2;
 	Rect Rec(x0, y0, w0, h0);
 	Mat ROI; 
 	S(Rec).copyTo(ROI);
 //Full window Search
-	auto ploty = xt::linspace<double>(0, ROI.rows-1, ROI.rows);
-	xt::xarray<double> left_fitx = fullSearch(ROI, ploty);
+	m_ploty = xt::linspace<double>(0, ROI.rows-1, ROI.rows);
+	xt::xarray<double> left_fitx = fullSearch(ROI, m_ploty);
+//To do --> right_fitx
+//Compute lane curvature
+	computeLaneCurvature(m_ploty, left_fitx);
+}
+
 /*
 Next steps : 
-	* stocker mean(left_fitx) (centre)
-	* compute curvature;
 	* compute car's off-center distance;
 	* build visualisation;
+$sudo apt-get install libopenblas-dev
+$export LD_LIBRARY_PATH=/path/to/OpenBLAS:$LD_LIBRARY_PATHA
+$export BLAS=/path/to/libopenblas.a
+
+
 */
-}
+
+
+

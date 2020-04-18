@@ -14,6 +14,7 @@
 #include "xtensor/xio.hpp"
 #include "xtensor/xview.hpp"
 #include "xtensor/xindex_view.hpp"
+#include "xtensor/xfixed.hpp"
 #include "xtensor-blas/xlinalg.hpp"
 //=============================
 
@@ -39,6 +40,8 @@ int main(int argc, char **argv)
 	lane L(I);
 
 	L.processFrame();
+	cout << "Left curve radius = " << L.m_leftCurveRad << endl;
+	cout << "Curve direction = " << L.m_curveDir << endl;	
 	imwrite("../data/BEV.png", L.m_BEV);
 	imshow("Im_source", L.m_matSrc);
 	imshow("Bird Eye View", L.m_BEV);
@@ -46,4 +49,3 @@ int main(int argc, char **argv)
 	destroyAllWindows();	
 	return EXIT_SUCCESS;
 }
-

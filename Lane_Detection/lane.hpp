@@ -31,13 +31,17 @@ public:
 	const Mat transformingView(const Mat input, const int flag, const vector<Point2f> src);
 	void BirdEyeView();
 	Mat thresholdColChannel(int i = 1/*channel*/, const int s_thresh_min = 120, const int s_thresh_max = 255);
-	xt::xarray<double> polyfit2D(xt::xarray<int> &xValues, xt::xarray<int> &yValues);
+	xt::xarray<double> polyfit2D(xt::xarray<double> &xValues, xt::xarray<double> &yValues);
 	xt::xarray<double> fullSearch(const Mat RoI, const xt::xarray<double> ploty);
+	void computeLaneCurvature(const xt::xarray<double> ploty, const xt::xarray<double> leftx);
 	void processFrame();
 
 	//Variables d'instance
 	int m_frameWidth = 0;
 	int m_frameHeight = 0;
 	Mat m_matSrc, m_BEV, m_HSV;
+	xt::xarray<double> m_ploty;
+	xt::xarray<double> m_leftCurveRad, m_rightCurveRad;
+	int m_curveDir;
 };
 #endif

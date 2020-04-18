@@ -6,6 +6,7 @@ find_package(OpenCV 3 REQUIRED)
 find_package(xtensor REQUIRED)
 find_package(xtl REQUIRED)
 find_package(BLAS REQUIRED)
+find_package(Boost REQUIRED system)
 find_package(LAPACK REQUIRED)
 
 message(STATUS "BLAS VENDOR:    " ${BLA_VENDOR})
