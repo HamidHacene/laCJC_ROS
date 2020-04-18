@@ -9,6 +9,7 @@
 #include <string>
 #include <math.h>
 #include <vector>
+#include <string>
 
 //=============================
 #include "xtensor/xarray.hpp"
@@ -32,8 +33,9 @@ public:
 	void BirdEyeView();
 	Mat thresholdColChannel(int i = 1/*channel*/, const int s_thresh_min = 120, const int s_thresh_max = 255);
 	xt::xarray<double> polyfit2D(xt::xarray<double> &xValues, xt::xarray<double> &yValues);
-	xt::xarray<double> fullSearch(const Mat RoI, const xt::xarray<double> ploty);
+	xt::xarray<double> fullSearch(const Mat RoI, const xt::xarray<double> ploty, const string s0);
 	void computeLaneCurvature(const xt::xarray<double> ploty, const xt::xarray<double> leftx);
+	Mat thresholdRight();
 	void processFrame();
 
 	//Variables d'instance

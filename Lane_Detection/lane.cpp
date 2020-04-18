@@ -1,6 +1,7 @@
 #include "imgUtils.h"
 #include "lane.hpp"
 #include <vector>
+#include <string>
 //#include <cmath>
 //=============================
 #include "xtensor/xarray.hpp"
@@ -105,7 +106,7 @@ xt::xarray<double> lane::polyfit2D(xt::xarray<double> &xValues, xt::xarray<doubl
 	return coef;
 }
 
-xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> ploty)
+xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> ploty, const string s0)
 {
 //Compute the starting base of the first window
 /*
@@ -192,8 +193,8 @@ xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> plot
 		Point2f zz(xb+left_fitx(j), yb-ploty(j));
 		circle(RoIcol, zz, 1, CV_RGB(255,0,0));
 	}
-	imshow("RoI", RoIcol);
-	imwrite("../data/fit.png", RoIcol);
+	imshow(s0, RoIcol);
+	//imwrite("../data/fit.png", RoIcol);
 	return left_fitx; //left_fitx = aY² + bY + c
 }
 
@@ -214,7 +215,7 @@ void lane::computeLaneCurvature(const xt::xarray<double> ploty, const xt::xarray
 //Find curve direction
 	if((leftx(0) - leftx(leftx.size()-1)) > 28)
 	{
-		m_curveDir| = -1;
+		m_curveDir = -1;
 	}
 	else if((leftx(leftx.size()-1) - leftx(0)) > 28)
 	{
@@ -226,6 +227,16 @@ void lane::computeLaneCurvature(const xt::xarray<double> ploty, const xt::xarray
 	}
 }
 
+Mat lane::thresholdRight()
+{
+	//detection of the left line
+	Mat bin;
+	cvtColor(m_BEV, bin, COLOR_BGR2GRAY);
+	threshold(bin, bin, 180, 255, THRESH_OTSU);
+	imshow("test", bin);	
+	return bin;
+}
+
 void lane::processFrame()
 {
 //Build Bird Eye View
@@ -235,12 +246,19 @@ void lane::processFrame()
 //Select the appropriate ROI (here we only select the left one)
 //-->Left ROI
 	int x0 = 0, y0 = m_frameHeight/2, w0 = m_frameWidth/2 , h0 = m_frameHeight/2;
-	Rect Rec(x0, y0, w0, h0);
-	Mat ROI; 
-	S(Rec).copyTo(ROI);
+	Rect Rec1(x0, y0, w0, h0);
+	Mat ROIL; 
+	S(Rec1).copyTo(ROIL);
+//-->Right ROI
+	Mat SR = thresholdRight();	
+	x0 = m_frameWidth/2, y0 = m_frameHeight/2, w0 = m_frameWidth/2 , h0 = m_frameHeight/2;
+	Rect Rec2(x0, y0, w0, h0);
+	Mat ROIR; 
+	SR(Rec2).copyTo(ROIR);
 //Full window Search
-	m_ploty = xt::linspace<double>(0, ROI.rows-1, ROI.rows);
-	xt::xarray<double> left_fitx = fullSearch(ROI, m_ploty);
+	m_ploty = xt::linspace<double>(0, ROIR.rows-1, ROIR.rows);
+	xt::xarray<double> left_fitx = fullSearch(ROIL, m_ploty, "ROIL");
+	xt::xarray<double> right_fitx = fullSearch(ROIR, m_ploty, "ROIR");
 //To do --> right_fitx
 //Compute lane curvature
 	computeLaneCurvature(m_ploty, left_fitx);

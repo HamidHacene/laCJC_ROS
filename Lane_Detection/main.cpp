@@ -42,7 +42,7 @@ int main(int argc, char **argv)
 	L.processFrame();
 	cout << "Left curve radius = " << L.m_leftCurveRad << endl;
 	cout << "Curve direction = " << L.m_curveDir << endl;	
-	imwrite("../data/BEV.png", L.m_BEV);
+	//imwrite("../data/BEV.png", L.m_BEV);
 	imshow("Im_source", L.m_matSrc);
 	imshow("Bird Eye View", L.m_BEV);
 	waitKey(0);
