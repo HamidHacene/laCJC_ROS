@@ -18,7 +18,7 @@ using namespace cv;
 
 lane::lane(const Mat s) : m_frameWidth(s.cols), m_frameHeight(s.rows), m_matSrc(s.clone())
 {
-	m_tpl = imread("../data/body.png", CV_LOAD_IMAGE_COLOR);
+	m_tpl = imread("/home/hamid/Documents/S4/Projet_ROS/laCJC_ROS/ROS_package/src/control/road_det/data/body.png", CV_LOAD_IMAGE_COLOR);
 }
 
 const vector<Point2f> lane::computeSrcROI()

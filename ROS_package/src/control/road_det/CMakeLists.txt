@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0)
 project(road_det)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
@@ -7,6 +7,13 @@ project(road_det)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+add_definitions(-DHAVE_CBLAS=1)
+find_package(OpenCV 3 REQUIRED)
+find_package(xtensor REQUIRED)
+find_package(xtl REQUIRED)
+find_package(BLAS REQUIRED)
+find_package(Boost REQUIRED system)
+find_package(LAPACK REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   geometry_msgs
@@ -20,6 +27,8 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   lanelib
 )
+message(STATUS "BLAS VENDOR:    " ${BLA_VENDOR})
+message(STATUS "BLAS LIBRARIES: " ${BLAS_LIBRARIES})
 
 ## System dependencies are found with CMake's conventions
 find_package(OpenCV 3 REQUIRED)
@@ -144,6 +153,10 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/road_det_node.cpp)
 
+if(MSVC)
+    set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
+endif()
+
 add_executable(traitement src/traitement.cpp)
 
 ## Rename C++ executable without prefix
@@ -165,6 +178,9 @@ target_link_libraries(traitement
   ${catkin_LIBRARIES}
   ${OpenCV_INCLUDE_DIRS}
   ${OpenCV_LIBS}
+  ${BLAS_LIBRARIES} 
+  ${LAPACK_LIBRARIES} 
+  xtensor
 )
 
 

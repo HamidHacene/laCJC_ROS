@@ -8,19 +8,28 @@
 #include <math.h>
 #include "lanelib/lane.hpp"
 
-using namespace std;
-using namespace cv;
+//=============================
+#include "xtensor/xarray.hpp"
+#include "xtensor/xio.hpp"
+#include "xtensor/xview.hpp"
+#include "xtensor/xadapt.hpp"
+#include "xtensor/xindex_view.hpp"
+#include "xtensor-blas/xlinalg.hpp"
+//=============================
 
 //==============================
 //===Global Vars================
 //==============================
-static const string OPENCV_WINDOW = "test window";
+static const std::string imSrc = "Im_source";
+static const std::string birdView = "Bird_Eye_View";
+static const std::string roiL = "ROIL";
+static const std::string roiR = "ROIR";
+
 class ImageConverter
 {
 	ros::NodeHandle nh_;
 	image_transport::ImageTransport it_;
 	image_transport::Subscriber image_sub_;
-	image_transport::Publisher image_pub_;
 
 public:
 	ImageConverter(): it_(nh_)
@@ -28,12 +37,12 @@ public:
 		// Subscrive to input video feed and publish output video feed
 		image_sub_ = it_.subscribe("/image", 1, &ImageConverter::process, this);
 		//image_pub_ = it_.advertise("/image_converter/output", 1);
-		namedWindow(OPENCV_WINDOW);
+		cv::namedWindow(imSrc);
 	}
 
 	~ImageConverter()
 	{
-		destroyWindow(OPENCV_WINDOW);
+		cv::destroyAllWindows();
 	}
 
 	void process(const sensor_msgs::ImageConstPtr& msg)
@@ -50,8 +59,16 @@ public:
 		}
 	//Code Here : use cv_ptr->image
 	//---------------------------------------------------------------------------------------------------
-		ROS_INFO("Shape : width = [%d] // height = [%d]", cv_ptr->image.cols, cv_ptr->image.rows);
-		imshow(OPENCV_WINDOW, cv_ptr->image);
+		//cv::imshow(OPENCV_WINDOW, cv_ptr->image);
+		cv::Mat B = cv_ptr->image.clone(); 
+		lane L(B);
+		L.processFrame();
+		std::cout << "Curve radius = " << L.m_curveRad << std::endl;
+		std::cout << "Curve direction = " << L.m_curveDir << std::endl;
+		std::cout << "OffCenter = " << L.m_offCenter << std::endl;
+		imshow(imSrc, L.m_matSrc);
+		imshow(birdView, L.m_BEV);		
+		cv::waitKey(0);
 	//----------------------------------------------------------------------------------------------------
 	}
 };
