@@ -193,7 +193,7 @@ xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> plot
 		m_bottom_r = xb;
 	}
 	auto left_fitx = left_fit(0,0)*(xt::pow(ploty, 2)) + left_fit(1,0)*ploty + left_fit(2,0);
-	for(int j=0; j<ploty.size() ; j++)
+	for(int j=0; j<ploty.size(); j++)
 	{
 		Point2f zz(left_fitx(j), ploty(j));
 		circle(RoIcol, zz, 1, CV_RGB(255,0,0));
@@ -206,6 +206,7 @@ xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> plot
 void lane::computeLaneCurvature(const xt::xarray<double> ploty, const xt::xarray<double> leftx, const xt::xarray<double> rightx)
 {
 //Choose maximum y-value --> bottom of the image
+//y_eval = m_frameHeight
 	xt::xarray<double> y_eval = xt::amax(ploty);
 //Conversion in x & y from pixels -> meters
 	double ym_per_pix = 7./m_frameHeight;
