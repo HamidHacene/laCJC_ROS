@@ -1,0 +1,29 @@
+<launch>
+
+    <node name="image_convert" pkg="road_det" type="traitement">
+    </node>
+
+    <!-- Control :  -->
+    <!-- 
+        /setpoint/data is a plot of the std_msgs/Float64 messages which tell the PID controller the desired value the servo should be controlled to.
+        /state/data is a plot of the std_msgs/Float64 messages which are input to the PID controller from the controlled system.
+        /control_effort/data is a plot of the std_msgs/Float64 messages which are output from the PID controller and which apply correcting force to the controlled system.
+    -->
+
+    <remap from="/control_effort/data" to="/vrep_steering_angle" />
+
+    <node name="steering_pid" pkg="pid" type="controller">
+        <param name="Kp" value="0.5" />
+        <param name="Ki" value="0.0" />
+        <param name="Kd" value="0.01" />
+        <param name="upper_limit" value="0.5" />
+        <param name="lower_limit" value="-0.5" />
+        <param name="windup_limit" value="0.5" />
+        <param name="max_loop_frequency" value="100.0" />
+        <param name="min_loop_frequency" value="10.0" />
+    </node>
+
+    <!-- <node name="steering_pid_autotune" pkg="pid" type="autotune">
+    </node>-->
+
+</launch>
