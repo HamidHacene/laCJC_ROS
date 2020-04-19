@@ -10,7 +10,7 @@
         /control_effort/data is a plot of the std_msgs/Float64 messages which are output from the PID controller and which apply correcting force to the controlled system.
     -->
 
-    <remap from="/control_effort/data" to="/vrep_steering_angle" />
+    <remap from="/control_effort" to="/vrep_steer_angle" />
 
     <node name="steering_pid" pkg="pid" type="controller">
         <param name="Kp" value="0.5" />

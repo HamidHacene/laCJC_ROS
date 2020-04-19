@@ -9,8 +9,8 @@ function subscriber_steer_angle_callback(msg)
 	-- steer <0 --> turn right
 	-- steer >0 --> turn left
 	steer = msg.data
-	sim.setJointTargetPosition(SteerRight, steer)
-	sim.setJointTargetPosition(SteerLeft, steer)	
+	sim.setJointTargetPosition(SteerRight, -steer)
+	sim.setJointTargetPosition(SteerLeft, -steer)	
 	sim.addStatusbarMessage('cmd_steer subscriber receiver : steer ='..steer)
 end
 
@@ -55,10 +55,10 @@ function sysCall_init()
 	rosInterfacePresent = simROS
 	-- Prepare the publishers and subscribers :
 	if rosInterfacePresent then
-	  publisher1 = simROS.advertise('/simulationTime', 'std_msgs/Float32')
+	  publisher1 = simROS.advertise('/simulationTime', 'std_msgs/Float64')
 	  publisher2 = simROS.advertise('/pose', 'geometry_msgs/Pose')
-	  subscriber1 = simROS.subscribe('/vrep_speed_motor', 'std_msgs/Float32', 'subscriber_speed_motor_callback')
-	  subscriber2 = simROS.subscribe('/vrep_steer_angle', 'std_msgs/Float32', 'subscriber_steer_angle_callback')
+	  subscriber1 = simROS.subscribe('/vrep_speed_motor', 'std_msgs/Float64', 'subscriber_speed_motor_callback')
+	  subscriber2 = simROS.subscribe('/vrep_steer_angle', 'std_msgs/Float64', 'subscriber_steer_angle_callback')
 	end
 end
 

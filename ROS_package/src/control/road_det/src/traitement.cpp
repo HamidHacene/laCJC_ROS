@@ -90,8 +90,8 @@ int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "image_converter");
 	ros::NodeHandle nh_;
-	ros::Publisher carOffCenter = nh_.advertise<std_msgs::Float64>("/state/data", 100);
-	ros::Publisher carCenter = nh_.advertise<std_msgs::Float64>("/setpoint/data", 100);
+	ros::Publisher carOffCenter = nh_.advertise<std_msgs::Float64>("/state", 100);
+	ros::Publisher carCenter = nh_.advertise<std_msgs::Float64>("/setpoint", 100);
 
 	ImageConverter ic(&nh_, &carOffCenter, &carCenter);
 
