@@ -77,8 +77,6 @@ Mat lane::thresholdColChannel(int i, int s_thresh_min, int s_thresh_max)
 	vector<Mat> HSV_channels(3);
 	split(m_HSV, HSV_channels);
 	threshold(HSV_channels[i], HSV_channels[i], s_thresh_min, s_thresh_max, THRESH_OTSU);
-	//threshold(HSV_channels[i], m_HSV, s_thresh_min , s_thresh_max , THRESH_OTSU);
-	//merge(HSV_channels, m_HSV);
 	return HSV_channels[i];
 }
 
@@ -109,10 +107,6 @@ xt::xarray<double> lane::polyfit2D(xt::xarray<double> &xValues, xt::xarray<doubl
 xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> ploty, const string s0)
 {
 	//Compute the starting base of the first window
-	/*
-	Some improvement is needed here : since we have a two line lane, we need to
-	compute the barycenter of the maximums below.
-*/
 	Mat histo;
 	reduce(RoI, histo, 0, CV_REDUCE_SUM, CV_32S);
 
@@ -186,17 +180,10 @@ xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> plot
 //Extract left line pixel positions
 	xt::xarray<double> leftx = xt::adapt(line_center_x, shape);
 	xt::xarray<double> lefty = xt::adapt(line_center_y, shape);
-	cout << leftx << endl;
 //Compute the polynomial coefficient to fit with the line (2deg pol : ay² + by + c)
 	xt::xarray<double> left_fit = polyfit2D(lefty, leftx);
 //Visualize the line
-	int n = lefty.size();	
-	lefty.reshape({n});
-	leftx.reshape({n});
-	int yb = RoI.rows;
-	int xb = line_center_x[0];
-	/*
-  int xb = max_loc.x;
+	int xb = line_center_x[line_center_x.size()-1];
 	if(s0=="ROIL")
 	{
 		m_bottom_l = xb ;
@@ -205,22 +192,20 @@ xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> plot
 	{
 		m_bottom_r = xb;
 	}
-  */
-	auto left_fitx = left_fit(0)*(xt::pow(ploty, 2)) + left_fit(1)*ploty + left_fit(2);
-	for(int j=0; j<n; j++)
+	auto left_fitx = left_fit(0,0)*(xt::pow(ploty, 2)) + left_fit(1,0)*ploty + left_fit(2,0);
+	for(int j=0; j<ploty.size() ; j++)
 	{
-		Point2f zz(xb+left_fitx(j), yb-ploty(j));
+		Point2f zz(left_fitx(j), ploty(j));
 		circle(RoIcol, zz, 1, CV_RGB(255,0,0));
 	}
-	imshow(s0, RoIcol); /*
+	imshow(s0, RoIcol);
 	//imwrite("../data/fit.png", RoIcol);
 	return left_fitx; //left_fitx = aY² + bY + c*/
-	return 0;
 }
 
 void lane::computeLaneCurvature(const xt::xarray<double> ploty, const xt::xarray<double> leftx, const xt::xarray<double> rightx)
 {
-	//Choose maximum y-value --> bottom of the image
+//Choose maximum y-value --> bottom of the image
 	xt::xarray<double> y_eval = xt::amax(ploty);
 //Conversion in x & y from pixels -> meters
 	double ym_per_pix = 7./m_frameHeight;
@@ -231,30 +216,29 @@ void lane::computeLaneCurvature(const xt::xarray<double> ploty, const xt::xarray
 	xt::xarray<double> tmp3 = xm_per_pix*rightx;
 	xt::xarray<double> left_fit_cr = polyfit2D(tmp1, tmp2);
 	xt::xarray<double> right_fit_cr = polyfit2D(tmp1, tmp3);
-	//Compute radius of curvature in meters : R = ((1+(2Ay+B)²)^(3/2))/(|2A|)
+//Compute radius of curvature in meters : R = ((1+(2Ay+B)²)^(3/2))/(|2A|)
 	m_leftCurveRad = pow((1 + pow(2 * left_fit_cr(0) * y_eval * ym_per_pix + left_fit_cr(1), 2)), 1.5) / abs(2 * left_fit_cr(0));
 	m_rightCurveRad = pow((1 + pow(2 * right_fit_cr(0) * y_eval * ym_per_pix + right_fit_cr(1), 2)), 1.5) / abs(2 * right_fit_cr(0));
 	m_curveRad = (m_leftCurveRad + m_rightCurveRad) / 2;
-	//Find curve direction
+//Find curve direction
 	if ((leftx(0) - leftx(leftx.size() - 1)) > 28)
 	{
-		m_curveDir = -1;
+		m_curveDir = 1;  //right
 	}
 	else if ((leftx(leftx.size() - 1) - leftx(0)) > 28)
 	{
-		m_curveDir = 1;
+		m_curveDir = -1;  //left
 	}
 	else
 	{
-		m_curveDir = 0;
+		m_curveDir = 0;  //straight
 	}
 }
 
 Mat lane::thresholdRight()
 {
-	//detection of the left line
+//detection of the right line
 	Mat bin;
-	//cvtColor(m_BEV, bin, COLOR_BGR2GRAY);
 	const int max_value = 255;
 	int Rmin = 137, Gmin = 163, Bmin = 157;
 	int Rmax = 175, Gmax = 255, Bmax = 238;
@@ -264,23 +248,15 @@ Mat lane::thresholdRight()
 
 double lane::computeCarOffcenter(const xt::xarray<double> leftx, const double mid, const xt::xarray<double> rightx)
 {
-	double bottom_l = m_bottom_l; //m_frameWidth/2 - leftx(leftx.size()-1);
-	double bottom_r = m_bottom_r + m_frameWidth/2; //rightx(rightx.size()-1) + m_frameWidth/2;
+	double bottom_l = m_bottom_l;
+	double bottom_r = m_bottom_r + m_frameWidth/2;
 	double a = mid - bottom_l;
 	double b = bottom_r - mid;
 	double width = bottom_r - bottom_l;
 	double offset;
-
 	circle(m_BEV, Point(bottom_l, 500), 5, CV_RGB(255,0,0));
 	circle(m_BEV, Point(bottom_r, 500), 5, CV_RGB(0,255,0));
 	circle(m_BEV, Point(mid, 500), 5, CV_RGB(0,0,255));
-
-	std::cout << " m_mid = " << mid << std::endl;
-	std::cout << " bottom_l = " << bottom_l << std::endl;
-	std::cout << " bottom_r = " << bottom_r << std::endl;
-	std::cout << " a = " << a << std::endl;
-	std::cout << " b = " << b << std::endl;
-	std::cout << " width = " << width << std::endl;
 	if (a >= b)
 	{
 		offset = a/width*LANEWIDTH-LANEWIDTH/2.0;
@@ -295,17 +271,15 @@ double lane::computeCarOffcenter(const xt::xarray<double> leftx, const double mi
 double lane::computeMid(const Mat M, const Mat templ)
 {
 	Mat img_display, result;
-	//M.copyTo(img_display);
 	result.create(M.cols-templ.cols+1, M.rows-templ.rows+1, CV_32FC1);
+//match the template
 	matchTemplate(M, templ, result, 3);
 	normalize(result, result, 0, 1, NORM_MINMAX, -1, Mat());
+//find the loction of the template in the image
 	double minVal; double maxVal; Point minLoc; Point maxLoc;
 	minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, Mat());
-	//circle(img_display, Point(maxLoc.x+templ.cols/2, maxLoc.y), 5, CV_RGB(255,0,255));
-	//circle(img_display, Point(maxLoc.x+templ.cols/2, maxLoc.y+templ.rows), 5, CV_RGB(255,0,0));
-	//rectangle(img_display, maxLoc, Point(maxLoc.x+templ.cols, maxLoc.y+templ.rows), Scalar::all(0), 2, 8, 0);	
-	//imshow("image_window", img_display);
 	double x0 = maxLoc.x + templ.cols/2, y0 = maxLoc.y+templ.rows;
+//Now, we need to convert the (x,y) from the source image to (x',y') in BirdEye View
 	vector<Point2f> srcPts = computeSrcROI();
 	Mat ss = transformingView(m_BEV, 1, srcPts);
 	xt::xarray<double> mInv = xt::zeros<double>({3,3});	
@@ -316,30 +290,33 @@ double lane::computeMid(const Mat M, const Mat templ)
 			mInv(i,j) = m_transformationMatrix.at<double>(i,j);
 		}
 	}
+//We need to inverse the matrix to have : SRC --> BirdEyeView
 	mInv = xt::linalg::inv(mInv);
+//We apply the transformation matrix to the point
 	int xn1 = (mInv(0,0)*x0 + mInv(0,1)*y0 + mInv(0,2))/(mInv(2,0)*x0 + mInv(2,1)*y0 + mInv(2,2));
+//We only need the x position
 	return xn1;
 }
 
 void lane::processFrame()
 {
-	//Build Bird Eye View
+//Build Bird Eye View
 	BirdEyeView();
-	//Apply a thresh on S channel
+//Apply a thresh on S channel
 	Mat S = thresholdColChannel();
-	//Select the appropriate ROI (here we only select the left one)
-	//-->Left ROI
+//Select the appropriate ROI (here we only select the left one)
+//-->Left ROI
 	int x0 = 0, y0 = m_frameHeight / 2, w0 = m_frameWidth / 2, h0 = m_frameHeight / 2;
 	Rect Rec1(x0, y0, w0, h0);
 	Mat ROIL;
 	S(Rec1).copyTo(ROIL);
-	//-->Right ROI
+//-->Right ROI
 	Mat SR = thresholdRight();
 	x0 = m_frameWidth / 2, y0 = m_frameHeight / 2, w0 = m_frameWidth / 2, h0 = m_frameHeight / 2;
 	Rect Rec2(x0, y0, w0, h0);
 	Mat ROIR;
 	SR(Rec2).copyTo(ROIR);
-	//Full window Search
+//Full window Search
 	m_ploty = xt::linspace<double>(0, ROIR.rows - 1, ROIR.rows);
 	xt::xarray<double> left_fitx = fullSearch(ROIL, m_ploty, "ROIL");
 	xt::xarray<double> right_fitx = fullSearch(ROIR, m_ploty, "ROIR");
