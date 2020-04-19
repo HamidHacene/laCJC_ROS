@@ -1,6 +1,3 @@
-//https://www.youtube.com/watch?v=yvfI4p6Wyvk
-//https://www.youtube.com/watch?v=u2mmfdRicSQ
-
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
@@ -9,6 +6,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
 #include <math.h>
+
+#include "lanelib/lane.hpp"
 
 using namespace std;
 using namespace cv;
