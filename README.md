@@ -44,15 +44,13 @@
   ```
 
 
-  ###### openBlas : 
+###### openBlas : 
 
   ```
     $ sudo apt-get install libopenblas-dev
-    $ export LD_LIBRARY_PATH=/path/to/OpenBLAS:$LD_LIBRARY_PATHA
-    $ export BLAS=/path/to/libopenblas.a
   ```
-## Lane detection
 
+## Lane detection
 
 <p align="center">
     <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/Lane_Detection/data/virageG.png"> <br>
