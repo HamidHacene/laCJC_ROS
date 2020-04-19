@@ -1,4 +1,5 @@
 #include <ros/ros.h>
+#include "std_msgs/Int64.h"
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
@@ -7,7 +8,7 @@
 #include <opencv2/core/core.hpp>
 #include <math.h>
 #include "lanelib/lane.hpp"
-
+#include <unistd.h>
 //=============================
 #include "xtensor/xarray.hpp"
 #include "xtensor/xio.hpp"
@@ -25,19 +26,24 @@ static const std::string birdView = "Bird_Eye_View";
 static const std::string roiL = "ROIL";
 static const std::string roiR = "ROIR";
 
+int dir = 0;
+double offCenter;
+double curR;
+
 class ImageConverter
 {
 	ros::NodeHandle nh_;
 	image_transport::ImageTransport it_;
 	image_transport::Subscriber image_sub_;
-
 public:
 	ImageConverter(): it_(nh_)
 	{
-		// Subscrive to input video feed and publish output video feed
 		image_sub_ = it_.subscribe("/image", 1, &ImageConverter::process, this);
 		//image_pub_ = it_.advertise("/image_converter/output", 1);
 		cv::namedWindow(imSrc);
+		cv::namedWindow(birdView);
+		cv::namedWindow(roiL);
+		cv::namedWindow(roiR);
 	}
 
 	~ImageConverter()
@@ -63,12 +69,16 @@ public:
 		cv::Mat B = cv_ptr->image.clone(); 
 		lane L(B);
 		L.processFrame();
-		std::cout << "Curve radius = " << L.m_curveRad << std::endl;
-		std::cout << "Curve direction = " << L.m_curveDir << std::endl;
-		std::cout << "OffCenter = " << L.m_offCenter << std::endl;
-		imshow(imSrc, L.m_matSrc);
-		imshow(birdView, L.m_BEV);		
-		cv::waitKey(0);
+		//std::cout << "Curve radius = " << L.m_curveRad << std::endl;
+		//std::cout << "Curve direction = " << L.m_curveDir << std::endl;
+		//std::cout << "OffCenter = " << L.m_offCenter << std::endl;
+		dir = L.m_curveDir;
+		//offCenter = L.m_offCenter;
+		//curR = L.m_curveRad;
+		//imshow(imSrc, L.m_matSrc);
+		//imshow(birdView, L.m_BEV);		
+		//usleep(1000000.);
+		//cv::waitKey(0);
 	//----------------------------------------------------------------------------------------------------
 	}
 };
@@ -76,7 +86,15 @@ public:
 int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "image_converter");
+	ros::Publisher carDir = n.advertise<std_msgs::Int64>("direction", 100);
+	//ros::Publisher carOffCenter = n.advertise<std_msgs::Float64>("ecart", 100);
+	//ros::Publisher roadCurve = n.advertise<std_msgs::Float64>("courbure", 100);
 	ImageConverter ic;
+	std_msgs::Int64 msg1;
+	msg1.data = dir;
+	carDir.publish(msg1);
+	//carOffcenter.publish(offCenter);
+	//roadCurve.publish(curR);
 	ros::spin();
 	return 0;
 }
