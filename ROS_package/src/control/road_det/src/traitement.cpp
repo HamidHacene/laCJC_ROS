@@ -20,10 +20,7 @@
 //==============================
 //===Global Vars================
 //==============================
-static const std::string imSrc = "Im_source";
-static const std::string birdView = "Bird_Eye_View";
-static const std::string roiL = "ROIL";
-static const std::string roiR = "ROIR";
+static const std::string res = "Result";
  
 class ImageConverter
 {
@@ -36,10 +33,7 @@ public:
 	ImageConverter(const ros::NodeHandle *nh_, const ros::Publisher *pub, const ros::Publisher *pub2) : it_(*nh_)
 	{
 		image_sub_ = it_.subscribe("/image", 1, &ImageConverter::process, this);
-		cv::namedWindow(imSrc);
-		cv::namedWindow(birdView);
-		cv::namedWindow(roiL);
-		cv::namedWindow(roiR);
+		cv::namedWindow(res);
 		carOffCenter = pub;
 		carCenter = pub2;
  	}
@@ -48,7 +42,7 @@ public:
 	{
 		cv::destroyAllWindows();
 	}
- 
+
 	void process(const sensor_msgs::ImageConstPtr &msg)
 	{
 		cv_bridge::CvImagePtr cv_ptr;
@@ -67,9 +61,9 @@ public:
 		cv::Mat B = cv_ptr->image.clone();
 		lane L(B);
 		L.processFrame();
-		std::cout << "Curve radius = " << L.m_curveRad << std::endl;
-		std::cout << "Curve direction = " << L.m_curveDir << std::endl;
-		std::cout << "OffCenter = " << L.m_offCenter << std::endl;
+		//std::cout << "Curve radius = " << L.m_curveRad << std::endl;
+		//std::cout << "Curve direction = " << L.m_curveDir << std::endl;
+		//std::cout << "OffCenter = " << L.m_offCenter << std::endl;
 
 		std_msgs::Float64 message;
 		message.data = L.m_offCenter;
@@ -78,14 +72,14 @@ public:
 		std_msgs::Float64 message2;
 		message2.data = 0.0;
 		carCenter->publish(message2);
-
-		imshow(imSrc, L.m_matSrc);
-		imshow(birdView, L.m_BEV);
+		L.buildVisu(res);
+		//imshow(imSrc, L.m_matSrc);
+		//imshow(birdView, L.m_BEV);
 		cv::waitKey(1);
  		//----------------------------------------------------------------------------------------------------
 	}
 };
- 
+
 int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "image_converter");

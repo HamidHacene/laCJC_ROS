@@ -38,7 +38,9 @@ public:
 	Mat thresholdRight();
 	double computeCarOffcenter(const xt::xarray<double> leftx, const double mid, const xt::xarray<double> rightx);
 	double computeMid(const Mat M, const Mat templ);
+	void showTxtData();
 	void processFrame();
+	void buildVisu(const string s);
 
 	//Variables d'instance
 	int m_frameWidth = 0;

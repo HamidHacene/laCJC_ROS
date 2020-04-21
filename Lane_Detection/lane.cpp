@@ -2,7 +2,7 @@
 #include "lane.hpp"
 #include <vector>
 #include <string>
-//#include <cmath>
+#include <stdlib.h>  /*abs*/
 //=============================
 #include "xtensor/xarray.hpp"
 #include "xtensor/xio.hpp"
@@ -170,9 +170,21 @@ xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> plot
 		{
 			line_center_x.push_back((right_lane_inds[i] + left_lane_inds[i]) / 2);
 			line_center_y.push_back(i*windowHeight);
-			Point pt_low(left_lane_inds[i], i*windowHeight);
-			Point pt_high(right_lane_inds[i], (i+1)*windowHeight);
-			rectangle(RoIcol, pt_low, pt_high, Scalar(0, 255, 0), 2, 8, 0);
+			//Point pt_low(left_lane_inds[i], i*windowHeight);
+			//Point pt_high(right_lane_inds[i], (i+1)*windowHeight);
+			//rectangle(RoIcol, pt_low, pt_high, Scalar(0, 255, 0), 2, 8, 0);
+			if(s0=="ROIL")
+			{
+				Point pt_low(left_lane_inds[i], m_frameHeight/2 + i*windowHeight);
+				Point pt_high(right_lane_inds[i], m_frameHeight/2 + (i+1)*windowHeight);
+				rectangle(m_BEV, pt_low, pt_high, Scalar(0, 255, 0), 2, 8, 0);
+			}
+			else
+			{
+				Point pt_low(m_frameWidth/2 + left_lane_inds[i], m_frameHeight/2 + i*windowHeight);
+				Point pt_high(m_frameWidth/2 + right_lane_inds[i], m_frameHeight/2 + (i+1)*windowHeight);
+				rectangle(m_BEV, pt_low, pt_high, Scalar(0, 255, 0), 2, 8, 0);
+			}
 		}
 	}
 
@@ -183,7 +195,8 @@ xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> plot
 //Compute the polynomial coefficient to fit with the line (2deg pol : ay² + by + c)
 	xt::xarray<double> left_fit = polyfit2D(lefty, leftx);
 //Visualize the line
-	int xb = line_center_x[line_center_x.size()-1];
+	auto left_fitx = left_fit(0,0)*(xt::pow(ploty, 2)) + left_fit(1,0)*ploty + left_fit(2,0);
+	int xb = left_fitx[left_fitx.size()-1];
 	if(s0=="ROIL")
 	{
 		m_bottom_l = xb;
@@ -192,13 +205,22 @@ xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> plot
 	{
 		m_bottom_r = xb;
 	}
-	auto left_fitx = left_fit(0,0)*(xt::pow(ploty, 2)) + left_fit(1,0)*ploty + left_fit(2,0);
 	for(int j=0; j<ploty.size(); j++)
 	{
-		Point2f zz(left_fitx(j), ploty(j));
-		circle(RoIcol, zz, 1, CV_RGB(255,0,0));
+		//Point2f zz(left_fitx(j), ploty(j));
+		//circle(RoIcol, zz, 1, CV_RGB(255,0,0));
+		if(s0=="ROIL")
+		{
+			Point2f zz(left_fitx(j), m_frameHeight/2 + ploty(j));
+			circle(m_BEV, zz, 1, CV_RGB(255,0,0));
+		}
+		else
+		{
+			Point2f zz(m_frameWidth/2 + left_fitx(j), m_frameHeight/2 + ploty(j));
+			circle(m_BEV, zz, 1, CV_RGB(255,0,0));
+		}
 	}
-	imshow(s0, RoIcol);
+	//imshow(s0, RoIcol);
 	//imwrite("../data/fit.png", RoIcol);
 	return left_fitx; //left_fitx = aY² + bY + c*/
 }
@@ -255,9 +277,9 @@ double lane::computeCarOffcenter(const xt::xarray<double> leftx, const double mi
 	double b = bottom_r - mid;
 	double width = bottom_r - bottom_l;
 	double offset;
-	circle(m_BEV, Point(bottom_l, 500), 5, CV_RGB(255,0,0));
-	circle(m_BEV, Point(bottom_r, 500), 5, CV_RGB(0,255,0));
-	circle(m_BEV, Point(mid, 500), 5, CV_RGB(0,0,255));
+	circle(m_BEV, Point(bottom_l, 500), 5, CV_RGB(0,0,0), -1);
+	circle(m_BEV, Point(bottom_r, 500), 5, CV_RGB(0,0,0), -1);
+	circle(m_BEV, Point(mid, 500), 5, CV_RGB(0,0,255), -1);
 	if (a >= b)
 	{
 		offset = a/width*LANEWIDTH-LANEWIDTH/2.0;
@@ -306,6 +328,7 @@ void lane::processFrame()
 //Apply a thresh on S channel
 	Mat S = thresholdColChannel();
 //Select the appropriate ROI (here we only select the left one)
+	line(m_BEV, Point(0,m_frameHeight/2), Point(m_frameWidth,m_frameHeight/2), CV_RGB(255,255,0), 1, 8);
 //-->Left ROI
 	int x0 = 0, y0 = m_frameHeight / 2, w0 = m_frameWidth / 2, h0 = m_frameHeight / 2;
 	Rect Rec1(x0, y0, w0, h0);
@@ -328,7 +351,50 @@ void lane::processFrame()
 	m_offCenter = computeCarOffcenter(left_fitx, midl, right_fitx);
 }
 
-/*
-Next steps : 
-	* build visualisation;
-*/
+/*Visualization functions*/
+void lane::showTxtData()
+{
+	int fontFace = FONT_HERSHEY_SIMPLEX;
+	double fontScale = 1;
+	int thickness = 2;
+
+	string rs = "Road Status";
+	int baseline = 0;
+	Size textSize = getTextSize(rs, fontFace, fontScale, thickness, &baseline);
+	putText(m_matSrc, rs, Point(0, textSize.height), fontFace, fontScale, Scalar::all(255), thickness, 8);
+
+	fontScale = 0.8;
+	thickness = 2;
+	rs = "   Lane info: "; 
+	if(m_curveDir==0) rs += "Straight";
+	else if(m_curveDir==-1) rs += "Left curve";
+	else rs += "Right curve";
+
+	baseline = 0;
+	textSize += getTextSize(rs, fontFace, fontScale, thickness, &baseline);
+	putText(m_matSrc, rs, Point(0, textSize.height+8), fontFace, fontScale, Scalar::all(255), thickness, 8);
+
+	rs = "   Curvature: " + std::to_string(m_curveRad(0)) + " m";
+	textSize += getTextSize(rs, fontFace, fontScale, thickness, &baseline);
+	putText(m_matSrc, rs, Point(0, textSize.height+16), fontFace, fontScale, Scalar::all(255), thickness, 8);
+
+	if(m_offCenter<0) rs = "   Off center: Left " + std::to_string(abs(m_offCenter)) + " m";
+	else if(m_offCenter>0) rs = "   Off center: Right " + std::to_string(abs(m_offCenter)) + " m";
+	else rs = "   Off center: Straight 0 m";
+	textSize += getTextSize(rs, fontFace, fontScale, thickness, &baseline);
+	putText(m_matSrc, rs, Point(0, textSize.height+24), fontFace, fontScale, Scalar::all(255), thickness, 8);
+}
+
+void lane::buildVisu(const string s)
+{
+	showTxtData();
+	Mat visual(Size(m_matSrc.cols*2, m_matSrc.rows), m_matSrc.type(), Scalar::all(0));
+	Mat matRoi = visual(Rect(0,0,m_matSrc.cols,m_matSrc.rows));
+	m_matSrc.copyTo(matRoi);
+
+	matRoi = visual(Rect(m_matSrc.cols,0,m_matSrc.cols,m_matSrc.rows));
+	m_BEV.copyTo(matRoi);
+	
+	resize(visual, visual, Size(), 0.75, 0.75);
+	imshow(s, visual);
+}

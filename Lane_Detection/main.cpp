@@ -34,15 +34,19 @@ static void help(char **argv)
 //=============================================================================================
 int main(int argc, char **argv)
 {
-	Mat I = imread("../data/virageG.png", CV_LOAD_IMAGE_COLOR);
+	Mat I = imread("../data/image.png", CV_LOAD_IMAGE_COLOR);
 	lane L(I);
 	L.processFrame();
-	cout << "Curve radius = " << L.m_curveRad << endl;
-	cout << "Curve direction = " << L.m_curveDir << endl;
-	cout << "OffCenter = " << L.m_offCenter << endl;		
+	L.buildVisu("Result");
+	//cout << "Curve radius = " << L.m_curveRad << endl;
+	//cout << "Curve direction = " << L.m_curveDir << endl;
+	//cout << "OffCenter = " << L.m_offCenter << endl;		
 	//imwrite("../data/BEV.png", L.m_BEV);
-	imshow("Im_source", L.m_matSrc);
-	imshow("Bird Eye View", L.m_BEV);
+	
+	//imshow("Result", visual);
+	//imshow("Im_source", L.m_matSrc);
+	//imshow("Bird Eye View", L.m_BEV);
+	
 	waitKey(0);
 	destroyAllWindows();	
 	return EXIT_SUCCESS;
