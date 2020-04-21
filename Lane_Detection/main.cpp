@@ -36,14 +36,10 @@ int main(int argc, char **argv)
 {
 	Mat I = imread("../data/virageG.png", CV_LOAD_IMAGE_COLOR);
 	lane L(I);
-	std::cout << "depth = " << I.depth() << std::endl;
-	std::cout << "channels = " << I.channels() << std::endl;
-	std::cout << "type = " << I.type() << std::endl;
-	std::cout << "size = " << I.size() << std::endl;
-	//L.processFrame();
-	//cout << "Curve radius = " << L.m_curveRad << endl;
-	//cout << "Curve direction = " << L.m_curveDir << endl;
-	//cout << "OffCenter = " << L.m_offCenter << endl;		
+	L.processFrame();
+	cout << "Curve radius = " << L.m_curveRad << endl;
+	cout << "Curve direction = " << L.m_curveDir << endl;
+	cout << "OffCenter = " << L.m_offCenter << endl;		
 	//imwrite("../data/BEV.png", L.m_BEV);
 	imshow("Im_source", L.m_matSrc);
 	imshow("Bird Eye View", L.m_BEV);

@@ -186,7 +186,7 @@ xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> plot
 	int xb = line_center_x[line_center_x.size()-1];
 	if(s0=="ROIL")
 	{
-		m_bottom_l = xb ;
+		m_bottom_l = xb;
 	}
 	else
 	{
@@ -206,8 +206,8 @@ xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> plot
 void lane::computeLaneCurvature(const xt::xarray<double> ploty, const xt::xarray<double> leftx, const xt::xarray<double> rightx)
 {
 //Choose maximum y-value --> bottom of the image
-//y_eval = m_frameHeight
 	xt::xarray<double> y_eval = xt::amax(ploty);
+	y_eval = 512;
 //Conversion in x & y from pixels -> meters
 	double ym_per_pix = 7./m_frameHeight;
 	double xm_per_pix = LANEWIDTH/m_frameWidth;
