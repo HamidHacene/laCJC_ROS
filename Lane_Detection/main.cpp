@@ -17,6 +17,8 @@
 #include "xtensor/xfixed.hpp"
 #include "xtensor-blas/xlinalg.hpp"
 //=============================
+#include <chrono> 
+using namespace std::chrono; 
 
 
 using namespace cv;
@@ -34,10 +36,17 @@ static void help(char **argv)
 //=============================================================================================
 int main(int argc, char **argv)
 {
+	auto start = high_resolution_clock::now(); 
+	
 	Mat I = imread("../data/image.png", CV_LOAD_IMAGE_COLOR);
 	lane L(I);
 	L.processFrame();
 	L.buildVisu("Result");
+	
+	auto stop = high_resolution_clock::now();
+	
+	auto duration = duration_cast<microseconds>(stop - start);
+	cout << "elapsed time : " << duration.count()  << " microseconds" << endl;
 	//cout << "Curve radius = " << L.m_curveRad << endl;
 	//cout << "Curve direction = " << L.m_curveDir << endl;
 	//cout << "OffCenter = " << L.m_offCenter << endl;		
