@@ -397,4 +397,5 @@ void lane::buildVisu(const string s)
 	
 	resize(visual, visual, Size(), 0.75, 0.75);
 	imshow(s, visual);
+	imwrite("../data/result.png", visual);
 }
