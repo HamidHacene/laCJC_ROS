@@ -36,6 +36,7 @@ public:
 	xt::xarray<double> fullSearch(const Mat RoI, const xt::xarray<double> ploty, const string s0);
 	void computeLaneCurvature(const xt::xarray<double> ploty, const xt::xarray<double> leftx, const xt::xarray<double> rightx);
 	Mat thresholdRight();
+	Mat thresholdLeft();
 	double computeCarOffcenter(const xt::xarray<double> leftx, const double mid, const xt::xarray<double> rightx);
 	double computeMid(const Mat M, const Mat templ);
 	void showTxtData();
