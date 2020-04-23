@@ -1,4 +1,8 @@
 # laCJC_ROS
+## Démonstration
+
+https://youtu.be/LQ9LN_navPc
+
 ## Installation des librairies pour "TNI"
 
 
