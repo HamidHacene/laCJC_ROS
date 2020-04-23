@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 project(lanelib)
 
 add_definitions(-DHAVE_CBLAS=1)
-find_package(OpenCV 4 REQUIRED)
+find_package(OpenCV 3 REQUIRED)
 find_package(xtensor REQUIRED)
 find_package(xtl REQUIRED)
 find_package(BLAS REQUIRED)
