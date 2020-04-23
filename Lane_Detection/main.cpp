@@ -40,6 +40,7 @@ int main(int argc, char **argv)
 	
 	Mat I = imread("../data/test_offG.png", CV_LOAD_IMAGE_COLOR);
 	lane L(I);
+	L.m_curveDir = 0;
 	L.processFrame();
 	L.buildVisu("Result");
 	
@@ -47,9 +48,6 @@ int main(int argc, char **argv)
 	
 	auto duration = duration_cast<microseconds>(stop - start);
 	cout << "elapsed time : " << duration.count()  << " microseconds" << endl;
-	//cout << "Curve radius = " << L.m_curveRad << endl;
-	//cout << "Curve direction = " << L.m_curveDir << endl;
-	//cout << "OffCenter = " << L.m_offCenter << endl;		
 	//imwrite("../data/BEV.png", L.m_BEV);
 	
 	//imshow("Result", visual);
@@ -60,3 +58,4 @@ int main(int argc, char **argv)
 	destroyAllWindows();	
 	return EXIT_SUCCESS;
 }
+
