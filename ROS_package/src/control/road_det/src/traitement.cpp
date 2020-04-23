@@ -8,20 +8,15 @@
 #include <opencv2/core/core.hpp>
 #include <math.h>
 #include "lanelib/lane.hpp"
-//=============================
-#include "xtensor/xarray.hpp"
-#include "xtensor/xio.hpp"
-#include "xtensor/xview.hpp"
-#include "xtensor/xadapt.hpp"
-#include "xtensor/xindex_view.hpp"
-#include "xtensor-blas/xlinalg.hpp"
-//=============================
- 
+#include <vector>
 //==============================
 //===Global Vars================
 //==============================
 static const std::string res = "Result";
- 
+std::vector<int> buffer_dir {0,0,0,0};
+int cpt = 0;
+cv::Mat B;
+
 class ImageConverter
 {
 	image_transport::ImageTransport it_;
@@ -56,11 +51,29 @@ public:
 			return;
 		}
 		//Code Here : use cv_ptr->image
- 		//---------------------------------------------------------------------------------------------------
- 		//cv::imshow(OPENCV_WINDOW, cv_ptr->image);
-		cv::Mat B = cv_ptr->image.clone();
+		//---------------------------------------------------------------------------------------------------
+		//We fill the buffer
+		std::cout << "Filling the buffer" << std::endl;
+		while(cpt<4)
+		{
+			B = cv_ptr->image.clone();
+			lane Lb(B);
+			Lb.processFrame();
+			buffer_dir[cpt] = Lb.m_curveDir;
+			cpt++;			
+		}
+		//we use the last value to process the new frame
+		std::cout << "Processing new frame" << std::endl;
+		B = cv_ptr->image.clone();
 		lane L(B);
+		L.m_curveDir = buffer_dir[3];
 		L.processFrame();
+		//new frame's curveDir is storedd in the buffer for next spin
+		std::cout << "Updating the buffer" << std::endl;
+		buffer_dir[0] = buffer_dir[1];
+		buffer_dir[1] = buffer_dir[2];
+		buffer_dir[2] = buffer_dir[3];
+		buffer_dir[3] = L.m_curveDir;
 		//std::cout << "Curve radius = " << L.m_curveRad << std::endl;
 		//std::cout << "Curve direction = " << L.m_curveDir << std::endl;
 		//std::cout << "OffCenter = " << L.m_offCenter << std::endl;

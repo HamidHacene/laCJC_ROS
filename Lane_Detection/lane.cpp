@@ -108,12 +108,8 @@ xt::xarray<double> lane::polyfit2D(xt::xarray<double> &xValues, xt::xarray<doubl
 
 xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> ploty, const string s0)
 {
-	//Compute the starting base of the first window
-	Mat histo;
-	reduce(RoI, histo, 0, CV_REDUCE_SUM, CV_32S);
-
 	//Set height of windows
-	int nWindows = 20;
+	int nWindows = 13;
 	int windowHeight = RoI.rows / nWindows;
 
 	//Create empty lists to receive left lane pixel indices
@@ -126,8 +122,7 @@ xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> plot
 	//For visualization
 	Mat RoIcol;
 	cvtColor(RoI, RoIcol, CV_GRAY2RGB);
-	int currRightIndex = 100;
-	int currLeftIndex = 300;
+
 	//Loop
 	for (int w = 0; w < nWindows; w++)
 	{
@@ -138,140 +133,55 @@ xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> plot
 		//For each window, we increment currLeftIndex until the sum of the row of index currLeftIndex is superior to the threshold 255 * windowHeight * .3
 		//We decrement currRightIndex in the same way
 		int col_sum = 0;
-		if((m_curveDir==-1)and(s0=="ROIL")) //cas d'un virage gauche
+		int currLeftIndex = 0;
+		while (col_sum < 255 * windowHeight * .3 and currLeftIndex < RoI.cols)
 		{
-			currLeftIndex = currRightIndex-100;
-			while (col_sum < 255 * windowHeight * .3 and currLeftIndex <= currRightIndex)
-			{
-				currLeftIndex++;
-				col_sum = 0;
-				for (int i = win_y_low; i < win_y_high; i++)
-				{
-					Point pt(currLeftIndex, i);
-					col_sum += RoI.at<unsigned char>(pt);
-				}
-			}
+			currLeftIndex++;
 			col_sum = 0;
-			currRightIndex = currLeftIndex+100;
-			while (col_sum < 255 * windowHeight * .3 and currRightIndex >= currLeftIndex)
+			for (int i = win_y_low; i < win_y_high; i++)
 			{
-				currRightIndex--;
-				col_sum = 0;
-				for (int i = win_y_low; i < win_y_high; i++)
-				{
-					Point pt(currRightIndex, i);
-					col_sum += RoI.at<unsigned char>(pt);
-				}
+				Point pt(currLeftIndex, i);
+				col_sum += RoI.at<unsigned char>(pt);
 			}
 		}
-		else if((m_curveDir==0)or(m_curveDir==-1 and s0=="ROIR"))  //cas d'une ligne droite
+
+		col_sum = 0;
+		int currRightIndex = RoI.cols - 1;
+		while (col_sum < 255 * windowHeight * .3 and currRightIndex >= 0)
 		{
-			currLeftIndex = 150;
-			while (col_sum < 255 * windowHeight * .3 and currLeftIndex < RoI.cols-100)
-			{
-				currLeftIndex++;
-				col_sum = 0;
-				for (int i = win_y_low; i < win_y_high; i++)
-				{
-					Point pt(currLeftIndex, i);
-					col_sum += RoI.at<unsigned char>(pt);
-				}
-			}
+			currRightIndex--;
 			col_sum = 0;
-			currRightIndex = currLeftIndex+100;
-			while (col_sum < 255 * windowHeight * .3 and currRightIndex >= 150)
+			for (int i = win_y_low; i < win_y_high; i++)
 			{
-				currRightIndex--;
-				col_sum = 0;
-				for (int i = win_y_low; i < win_y_high; i++)
-				{
-					Point pt(currRightIndex, i);
-					col_sum += RoI.at<unsigned char>(pt);
-				}
+				Point pt(currRightIndex, i);
+				col_sum += RoI.at<unsigned char>(pt);
 			}
 		}
-		else if(m_curveDir==1 and s0=="ROIR") //cas d'un virage vers la droite
-		{		
-			currLeftIndex = 400;
-			while (col_sum < 255 * windowHeight * .3 and currLeftIndex < RoI.cols-1)
-			{
-				currLeftIndex++;
-				col_sum = 0;
-				for (int i = win_y_low; i < win_y_high; i++)
-				{
-					Point pt(currLeftIndex, i);
-					col_sum += RoI.at<unsigned char>(pt);
-				}
-			}
-			col_sum = 0;
-			currRightIndex = RoI.cols-1;
-			while (col_sum < 255 * windowHeight * .3 and currRightIndex >= currLeftIndex)
-			{
-				currRightIndex--;
-				col_sum = 0;
-				for (int i = win_y_low; i < win_y_high; i++)
-				{
-					Point pt(currRightIndex, i);
-					col_sum += RoI.at<unsigned char>(pt);
-				}
-			}
-		}
-		else if(m_curveDir==1 and s0=="ROIL")
-		{
-			currRightIndex = RoIcol.cols - 1;
-			while (col_sum < 255 * windowHeight * .3 and currRightIndex >= currLeftIndex and currRightIndex>0)
-			{
-				currRightIndex--;
-				col_sum = 0;
-				for (int i = RoI.rows - (w+1)*windowHeight; i < RoI.rows - w*windowHeight; i++)
-				{
-					Point pt(currRightIndex, i);
-					col_sum += RoI.at<unsigned char>(pt);
-				}
-			}	
-			col_sum = 0;
-			currLeftIndex = currRightIndex-50;
-			while (col_sum < 255 * windowHeight * .3 and currLeftIndex <= currRightIndex and currLeftIndex < RoIcol.cols)
-			{
-				currLeftIndex++;
-				col_sum = 0;
-				for (int i = RoI.rows - (w+1)*windowHeight; i < RoI.rows - w*windowHeight; i++)
-				{
-					Point pt(currLeftIndex, i);
-					col_sum += RoI.at<unsigned char>(pt);
-				}
-			}
-		}
+
 		left_lane_inds.push_back(currLeftIndex);
 		right_lane_inds.push_back(currRightIndex);
-
 		if (right_lane_inds[w] - left_lane_inds[w] > 0) //if a box was found
 		{
 			line_center_x.push_back((right_lane_inds[w] + left_lane_inds[w]) / 2);
-			int y = w * windowHeight;
-			if(m_curveDir==1 and s0=="ROIL")
-			{
-				y = RoI.rows - w * windowHeight;	
-			}
-			line_center_y.push_back(y);
-			Point pt_low(left_lane_inds[w], y);
-			Point pt_high(right_lane_inds[w], y + windowHeight);
+			line_center_y.push_back(w*windowHeight);
+			Point pt_low(left_lane_inds[w], w*windowHeight);
+			Point pt_high(right_lane_inds[w], (w+1)*windowHeight);
 			rectangle(RoIcol, pt_low, pt_high, Scalar(0, 255, 0), 2, 8, 0);
 			if (s0 == "ROIL")
 			{
-				Point pt_low(left_lane_inds[w], y);
-				Point pt_high(right_lane_inds[w], y + windowHeight);
+				Point pt_low(left_lane_inds[w], m_frameHeight/2 + w*windowHeight);
+				Point pt_high(right_lane_inds[w], m_frameHeight/2 + (w+1)*windowHeight);
 				rectangle(m_BEV, pt_low, pt_high, Scalar(0, 255, 0), 2, 8, 0);
 			}
 			else
 			{
-				Point pt_low(left_lane_inds[w], y);
-				Point pt_high(right_lane_inds[w], y + windowHeight);
+				Point pt_low(m_frameWidth/2 + left_lane_inds[w], m_frameHeight/2 + w*windowHeight);
+				Point pt_high(m_frameWidth/2 + right_lane_inds[w], m_frameHeight/2 + (w+1)*windowHeight);
 				rectangle(m_BEV, pt_low, pt_high, Scalar(0, 255, 0), 2, 8, 0);
-			}
-		}	
+			}			
+		}
 	}
-	std::vector<std::size_t> shape = {line_center_x.size()};
+	std::vector<std::size_t> shape = { line_center_x.size() };
 	if(line_center_x.size()<4)
 	{
 		if (s0 == "ROIL"){m_foundL=0;}
@@ -304,16 +214,16 @@ xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> plot
 			circle(RoIcol, zz, 1, CV_RGB(255, 0, 0));
 			if (s0 == "ROIL")
 			{
-				Point2f zz(left_fitx(j), ploty(j));
+				Point2f zz(left_fitx(j), m_frameHeight/2 + ploty(j));
 				circle(m_BEV, zz, 1, CV_RGB(255, 0, 0));
 			}
 			else
 			{
-				Point2f zz(left_fitx(j), ploty(j));
+				Point2f zz(m_frameWidth/2 + left_fitx(j), m_frameHeight/2 + ploty(j));
 				circle(m_BEV, zz, 1, CV_RGB(255, 0, 0));
 			}
 		}
-		//imshow(s0, RoIcol);
+		imshow(s0, RoIcol);
 		//imwrite("../data/fit.png", RoIcol);
 		return left_fitx; //left_fitx = aY² + bY + c
 	}
@@ -331,7 +241,7 @@ void lane::computeLaneCurvature(const xt::xarray<double> ploty, const xt::xarray
 	if(m_foundR==0 and m_foundL==0)
 	{
 		m_curveDir = 0;
-		m_curveRad = 500;
+		m_curveRad = 1500;
 	}
 	else if(m_foundR==0 and m_foundL==1)
 	{
@@ -406,6 +316,7 @@ void lane::computeLaneCurvature(const xt::xarray<double> ploty, const xt::xarray
 	}
 }
 
+
 Mat lane::thresholdRight()
 {
 	//detection of the right line
@@ -470,22 +381,22 @@ double lane::computeCarOffcenter(const xt::xarray<double> leftx, const double mi
 	double offset;
 	if(m_foundR==0 and m_foundL==0)
 	{
-		offset = 0;
+		offset = 1.3;
 	}
 	else if(m_foundR==0 and m_foundL==1)
 	{
 		double bottom_l = m_bottom_l;
 		double a = mid - bottom_l;
-		double width = 240;
+		double width = 250;
 		circle(m_BEV, Point(bottom_l, 500), 5, CV_RGB(0, 0, 0), -1);
 		circle(m_BEV, Point(mid, 500), 5, CV_RGB(0, 0, 255), -1);
 		offset = a / width * LANEWIDTH - LANEWIDTH / 2.0;
 	}
 	else if(m_foundR==1 and m_foundL==0)
 	{
-		double bottom_r = m_bottom_r;
+		double bottom_r = m_bottom_r + m_frameWidth/2;
 		double b = bottom_r - mid;
-		double width = 240;
+		double width = 250;
 		circle(m_BEV, Point(bottom_r, 500), 5, CV_RGB(0, 0, 0), -1);
 		circle(m_BEV, Point(mid, 500), 5, CV_RGB(0, 0, 255), -1);
 		offset = LANEWIDTH / 2.0 - b / width * LANEWIDTH;
@@ -493,11 +404,10 @@ double lane::computeCarOffcenter(const xt::xarray<double> leftx, const double mi
 	else if(m_foundR==1 and m_foundL==1)
 	{
 		double bottom_l = m_bottom_l;
-		double bottom_r = m_bottom_r;
+		double bottom_r = m_bottom_r + m_frameWidth/2;
 		double a = mid - bottom_l;
 		double b = bottom_r - mid;
 		double width = bottom_r - bottom_l;
-		cout << "width = " << width << endl;
 
 		circle(m_BEV, Point(bottom_l, 500), 5, CV_RGB(0, 0, 0), -1);
 		circle(m_BEV, Point(bottom_r, 500), 5, CV_RGB(0, 0, 0), -1);
@@ -551,17 +461,17 @@ void lane::processFrame()
 {
 	//Build Bird Eye View
 	BirdEyeView();
-
+	line(m_BEV, Point(0,m_frameHeight/2), Point(m_frameWidth,m_frameHeight/2), CV_RGB(255, 255, 0));
 	//Apply a thresh to extract Left line
 	Mat S = thresholdLeft();
-	int x0 = 0, y0 = 0, w0 = m_frameWidth, h0 = m_frameHeight;
+	int x0 = 0, y0 = m_frameHeight/2, w0 = m_frameWidth/2, h0 = m_frameHeight/2;
 	Rect Rec1(x0, y0, w0, h0);
 	Mat ROIL;
 	S(Rec1).copyTo(ROIL);
 
 	//Apply a thresh to extract Right line
 	Mat SR = thresholdRight();
-	x0 = 0, y0 = 0, w0 = m_frameWidth, h0 = m_frameHeight;
+	x0 = m_frameWidth / 2, y0 = m_frameHeight / 2, w0 = m_frameWidth / 2, h0 = m_frameHeight / 2;
 	Rect Rec2(x0, y0, w0, h0);
 	Mat ROIR;
 	SR(Rec2).copyTo(ROIR);
@@ -570,12 +480,6 @@ void lane::processFrame()
 	m_ploty = xt::linspace<double>(0, ROIR.rows - 1, ROIR.rows);
 	xt::xarray<double> left_fitx = fullSearch(ROIL, m_ploty, "ROIL");
 	xt::xarray<double> right_fitx = fullSearch(ROIR, m_ploty, "ROIR");
-	xt::xarray<double> xr = xt::amax(right_fitx);
-	xt::xarray<double> xl = xt::amax(left_fitx);
-	if(m_foundR==1 and m_foundL==1 and right_fitx(0) < left_fitx(0))
-	{
-		m_foundR = 0; m_foundL = 0;
-	}
 	//Compute lane curvature
 	computeLaneCurvature(m_ploty, left_fitx, right_fitx);
 	//Compute car offcenter

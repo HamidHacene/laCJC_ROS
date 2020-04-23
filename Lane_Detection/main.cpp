@@ -38,9 +38,8 @@ int main(int argc, char **argv)
 {
 	auto start = high_resolution_clock::now(); 
 	
-	Mat I = imread("../data/test_offG.png", CV_LOAD_IMAGE_COLOR);
+	Mat I = imread("../data/5.png", CV_LOAD_IMAGE_COLOR);
 	lane L(I);
-	L.m_curveDir = 0;
 	L.processFrame();
 	L.buildVisu("Result");
 	
