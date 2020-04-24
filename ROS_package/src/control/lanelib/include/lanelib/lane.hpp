@@ -22,7 +22,6 @@
 using namespace cv;
 using namespace std;
 
-
 class lane
 {
 public:
@@ -52,7 +51,8 @@ public:
 	Mat m_transformationMatrix, m_tpl;
 	xt::xarray<double> m_ploty;
 	xt::xarray<double> m_leftCurveRad, m_rightCurveRad, m_curveRad;
-	int m_curveDir;
+	int m_curveDir = -1;
+	int m_foundR = 0, m_foundL = 0;
 	double m_offCenter, m_mid;
 };
 #endif
