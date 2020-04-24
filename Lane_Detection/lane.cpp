@@ -475,7 +475,6 @@ void lane::processFrame()
 	Rect Rec2(x0, y0, w0, h0);
 	Mat ROIR;
 	SR(Rec2).copyTo(ROIR);
-
 	//Full window Search
 	m_ploty = xt::linspace<double>(0, ROIR.rows - 1, ROIR.rows);
 	xt::xarray<double> left_fitx = fullSearch(ROIL, m_ploty, "ROIL");
@@ -540,4 +539,5 @@ void lane::buildVisu(const string s)
 
 	resize(visual, visual, Size(), 0.75, 0.75);
 	imshow(s, visual);
+	imwrite("../data/visual.png", visual);
 }

@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 {
 	auto start = high_resolution_clock::now(); 
 	
-	Mat I = imread("../data/5.png", CV_LOAD_IMAGE_COLOR);
+	Mat I = imread("../data/image.png", CV_LOAD_IMAGE_COLOR);
 	lane L(I);
 	L.processFrame();
 	L.buildVisu("Result");
@@ -47,7 +47,7 @@ int main(int argc, char **argv)
 	
 	auto duration = duration_cast<microseconds>(stop - start);
 	cout << "elapsed time : " << duration.count()  << " microseconds" << endl;
-	//imwrite("../data/BEV.png", L.m_BEV);
+
 	
 	//imshow("Result", visual);
 	//imshow("Im_source", L.m_matSrc);

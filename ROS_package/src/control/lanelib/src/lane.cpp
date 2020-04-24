@@ -162,9 +162,9 @@ xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> plot
 		{
 			line_center_x.push_back((right_lane_inds[w] + left_lane_inds[w]) / 2);
 			line_center_y.push_back(w*windowHeight);
-			Point pt_low(left_lane_inds[w], w*windowHeight);
-			Point pt_high(right_lane_inds[w], (w+1)*windowHeight);
-			rectangle(RoIcol, pt_low, pt_high, Scalar(0, 255, 0), 2, 8, 0);
+			//Point pt_low(left_lane_inds[w], w*windowHeight);
+			//Point pt_high(right_lane_inds[w], (w+1)*windowHeight);
+			//rectangle(RoIcol, pt_low, pt_high, Scalar(0, 255, 0), 2, 8, 0);
 			if (s0 == "ROIL")
 			{
 				Point pt_low(left_lane_inds[w], m_frameHeight/2 + w*windowHeight);
@@ -208,8 +208,8 @@ xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> plot
 		}
 		for (int j = 0; j < ploty.size(); j++)
 		{
-			Point2f zz(left_fitx(j), ploty(j));
-			circle(RoIcol, zz, 1, CV_RGB(255, 0, 0));
+			//Point2f zz(left_fitx(j), ploty(j));
+			//circle(RoIcol, zz, 1, CV_RGB(255, 0, 0));
 			if (s0 == "ROIL")
 			{
 				Point2f zz(left_fitx(j), m_frameHeight/2 + ploty(j));
@@ -221,7 +221,7 @@ xt::xarray<double> lane::fullSearch(const Mat RoI, const xt::xarray<double> plot
 				circle(m_BEV, zz, 1, CV_RGB(255, 0, 0));
 			}
 		}
-		imshow(s0, RoIcol);
+		//imshow(s0, RoIcol);
 		//imwrite("../data/fit.png", RoIcol);
 		return left_fitx; //left_fitx = aY² + bY + c
 	}
