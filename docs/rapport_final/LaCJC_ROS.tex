@@ -12,6 +12,7 @@
 \usepackage{lmodern}
 \usepackage{enumitem}
 \usepackage{subcaption}
+\usepackage{hyperref}
 % pour charger des images
 \usepackage{graphicx}
 % répertoire dans lequel trouver les images
@@ -45,7 +46,17 @@
 \addcontentsline{toc}{chapter}{Introduction}
 Ce projet s'inscrit dans le cadre des enseignements de l'\textsc{ENSTA Bretagne} dispensés aux élèves de deuxième année de la filière \textit{Robotique Autonome} au sein de l'U.E 4.1 : \textit{Middleware}.\\
 
+<<<<<<< HEAD
 Ce rapport présente le travail effectué par l’équipe "La CJC ROS". La répartition du travail au sein du groupe peut être retrouvée sur le dépôt git à l’adresse suivante : \href{https://github.com/HamidHacene/laCJC_ROS}{la CJC}\footnote{https://github.com/HamidHacene/laCJC\_ROS}.\\
+=======
+L'objectif est d'utiliser des connaissances acquises au long de l'année pour réaliser un projet robotique concret. Ce projet permet de toucher à de nombreux domaines : CAO et conception mécanique, éléctronique, OS, réseau, conception logiciel, OpenCV... De plus, travailler sur un même code en groupe  n'est pas évident, il est donc important de s'y former.
+
+\section*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+In this article presents the realisation of an autonaumous 1:10 scale car. We will particularly talk about the software implementation. We have achied our goal using a rpi board and a camera and OpenCV to process images. ROS is used to have a modular code.
+
+\pagebreak
+>>>>>>> b5d2ff851ae198be8a7444f66db44fb074a962ed
 
 \section{Présentation du projet}
 \subsection{Problématique}
@@ -126,7 +137,12 @@ Nous avons ainsi construit l'architecture fonctionnelle générale suivante : on
 
 \section{Support matériel}
 \subsection{Présentation de la voiture}
+<<<<<<< HEAD
 Le véhicule utilisé dans ce projet a été construit durant le projet atelier \textsc{CNC} de l’UE 3.4. La première partie de fabrication du véhicule était la conception de quelques pièces mécaniques (support des roulements arrière, support du servo-moteur, etc...) sous \textit{Autodesk Inventor} à partir d'un modèle de base fourni par les professeurs de la filière.\\
+=======
+
+La voiture utilisé est une voiture radio-commandé d'echelle 1:10. Elle a une architecture très basique
+>>>>>>> b5d2ff851ae198be8a7444f66db44fb074a962ed
 
 La deuxième partie, consistait à fabriquer la voiture en manipulant les outillages du laboratoire de robotique de l'\textit{ENSTA Bretagne}. Les plans des pièces ont été harmonisés entre les différents groupes, mais nous avons décidé de remodeler certaines parties, notamment:
 
@@ -452,6 +468,7 @@ Pour ce qui est du poids de la voiture, les tests effectués avec des poids à l
 
 Concernant l'utilisation du capteur GNSS et de la centrale inertielle, nous avons délibérément choisi de ne pas les utiliser et d'effectuer seulement l'asservissement via le suivi de ligne. Comme améliorations possibles nous pourrions ainsi rajouter une odométrie visuelle avec la caméra et fusionner cette donnée avec celle du capteur GNSS et de la centrale inertielle afin d'avoir l'état complet de la voiture.\\ 
 
+<<<<<<< HEAD
 Pour la partie asservissement visuel, nous sommes encore loin d'atteindre des résultats fiables et robustes. En effet, quelques problèmes sont d'ores et déjà réglés comme la non détection des lignes sur une frame. Cependant, beaucoup d'améliorations restent à faire :
 \begin{itemize}[label=\textbullet, font=\small]
     \item Effectuer un \textit{FullSearch} uniquement sur la première frame. Ensuite, au lieu de rechercher les lignes de la voie sur toute l'image, on recherche uniquement dans une zone proche de la zone ou la détection s'est effectué sur l'image d'avant. L'implémentation de la librairie qui effectue la pipeline de contrôle en orienté objet permettrait de passer facilement à cette étape ;
@@ -460,12 +477,17 @@ Pour la partie asservissement visuel, nous sommes encore loin d'atteindre des r�
 \end{itemize}
 
 Enfin, après avoir suivi les cours de systèmes embarqués, nous comprenons que le fait d'utiliser un \textit{Linux} classique (comme \textit{Ubuntu}) n'est pas la solution optimale pour une \textit{Raspberry}. L'utilisation de Buildroot afin de concevoir et de compiler directement les briques élémentaires composant notre Linux embarqué, est un complément qui serait très intéressant. Nous ne savons pas si cela rendrait l'exécution des codes plus rapides, mais il serait bien de pouvoir comparer ces deux solutions différentes afin de choisir la meilleure des deux.\\
+=======
+\section{Perspectives et améliorations}
+--> Mettre toutes les améliorations possibles (Docker)
+>>>>>>> b5d2ff851ae198be8a7444f66db44fb074a962ed
 
 \section*{Conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}
 Pour conclure, ce projet nous a permis de mettre en pratique différents cours étudiés durant cette année, tels que ceux de \textit{ROS}, de \textit{Traitement d'image}, de \textit{VREP} ou même de \textit{Conception et réalisation}. Il s'apparente comme étant une synthèse de nos connaissances et permet à juste titre de faire le point sur nos compétences et nos capacités en tant que futur ingénieur roboticien.\\
 \pagebreak
 
+<<<<<<< HEAD
 \begin{appendix}
     \chapter{Complément Architecture Électronique}
     \label{carchf}
@@ -477,6 +499,16 @@ Le schéma suivant permet de valider le choix des capteurs, des adaptateurs de t
      \label{fig:arch_compl}
 \end{figure}
 \end{appendix}
+=======
+\section*{Annexe1 : Raspberry comme ordinateur de bord}
+\addcontentsline{toc}{chapter}{Annexe1}
+
+Nous avons choisi d'installer Raspbian sur notre raspberry, cela nous permet d'avoir un accès simple à la caméra, cependant l'installation de ROS est un peu plus longue, car il faut recompiler les sources.
+
+Pour installer ROS sur notre raspberry pi 3 nous avons suivi la documentation officielle :  \url{http://wiki.ros.org/ROSberryPi/Installing%20ROS%20Kinetic%20on%20the%20Raspberry%20Pi}
+
+
+>>>>>>> b5d2ff851ae198be8a7444f66db44fb074a962ed
 
 \pagebreak
 \listoffigures
