@@ -33,7 +33,6 @@ Pour utiliser les codes sources ou tester les programmes, il faut installer les 
     $ cd build
     $ cmake -D CMAKE_INSTALL_PREFIX=/usr/local ..
     $ sudo make install
-    $ cd ../..
   ```
 
 
@@ -46,8 +45,6 @@ Pour utiliser les codes sources ou tester les programmes, il faut installer les 
     $ cd build
     $ cmake -D CMAKE_INSTALL_PREFIX=/usr/local ..
     $ sudo make install
-    $ cd ../..
-    $ rm -r xtensor-master
   ```
 
 ###### xtensor-blas : 
@@ -59,7 +56,6 @@ Pour utiliser les codes sources ou tester les programmes, il faut installer les 
     $ cd build
     $ cmake -D CMAKE_INSTALL_PREFIX=/usr/local ..
     $ sudo make install
-    $ cd ../..
   ```
 
 
