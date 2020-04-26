@@ -7,7 +7,7 @@ La problématique de ce projet se résume à *rendre un véhicule autonome pour 
 
 <p>
     <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/docs/rapport_final/imgs/voiture.jpg" width="200" height="100" align="left">
-    <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/docs/rapport_final/imgs/terrain.jpg" width="200" height="100" align="right"> <br>
+    <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/docs/rapport_final/imgs/terrain.jpg" width="200" height="100" align="center"> <br>
     <em>Véhicule utilisé</em>
 </p>
 
