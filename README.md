@@ -5,11 +5,9 @@ Ce projet s’inscrit dans le cadre des enseignements de l’*ENSTA Bretagne* di
 ## Présentation du projet
 La problématique de ce projet se résume à *rendre un véhicule autonome pour accomplir un tour complet de la piste d’athlétisme de l’école*. Les véhicules mis à disposition sont des voitures à l’échelle 1/10ème construites dans un autre cours.
 
-<p align="center">
-    <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/docs/rapport_final/imgs/voiture.jpg"> <br>
-    <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/docs/rapport_final/imgs/voiture.jpg"> <br>
-    <em>Véhicule utilisé</em>
-</p>
+<img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/docs/rapport_final/imgs/voiture.jpg" width="200" height="100" align="left">
+<img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/docs/rapport_final/imgs/voiture.jpg" width="200" height="100" align="left">
+<em>Véhicule utilisé</em>
 
 
 
