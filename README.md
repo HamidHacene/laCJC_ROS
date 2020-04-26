@@ -12,8 +12,14 @@ La problématique de ce projet se résume à *rendre un véhicule autonome pour 
 </p>
 
 ## Démonstration
+Voici deux démonstration des résultats obtenus : 
+  * https://youtu.be/LQ9LN_navPc
+  * https://youtu.be/2UC-Q0rVsu8
 
-https://youtu.be/LQ9LN_navPc
+<p align="center">
+    <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/docs/rapport_final/imgs/test_res.png" width="600" height="400"> <br>
+    <em>Résultats</em>
+</p>
 
 ## Installation des librairies pour "TNI"
 
