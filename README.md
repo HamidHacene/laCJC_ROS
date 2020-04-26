@@ -1,6 +1,6 @@
 # laCJC_ROS
 ## Introduction
-Ce projet s’inscrit dans le cadre des enseignements de l’*ENSTA Bretagne* dispensés aux élèves de deuxième année de la filière *Robotique Autonome* au sein de l’Unité d'Eenseignement 4.1: *Middleware*.
+Ce projet s’inscrit dans le cadre des enseignements de l’*ENSTA Bretagne* dispensés aux élèves de deuxième année de la filière *Robotique Autonome* au sein de l’Unité d'Enseignement 4.1: *Middleware*.
 
 ## Présentation du projet
 La problématique de ce projet se résume à *rendre un véhicule autonome pour accomplir un tour complet de la piste d’athlétisme de l’école*. Les véhicules mis à disposition sont des voitures à l’échelle 1/10ème construites dans un autre cours.
@@ -8,7 +8,7 @@ La problématique de ce projet se résume à *rendre un véhicule autonome pour 
 <p align="center">
     <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/docs/rapport_final/imgs/voiture.jpg" width="300" height="200" style="float:left;">
     <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/docs/rapport_final/imgs/terrain.jpg" width="300" height="200" style="float:right;"> <br>
-    <em>Véhicule utilisé et piste d'atlétisme</em>
+    <em>Véhicule utilisé et piste d'athlétisme</em>
 </p>
 
 ## Démonstration
