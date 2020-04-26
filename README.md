@@ -116,5 +116,5 @@ Afin de lancer le simulateur, il faut suivre les étapes suivantes :
   * Il reste qu'à contrôler la vitesse d'avance et les coefficients du *PID* avec *rqt* :
 <p align="center">
     <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/docs/rapport_final/imgs/inter_ctrl.png" width="700" height="250"> <br>
-    <em>Contrôle avec *rqt*</em>
+    <em>Contrôle avec *rqt* </em>
 </p>
