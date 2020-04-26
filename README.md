@@ -21,11 +21,10 @@ Voici deux démonstration des résultats obtenus :
     <em>Résultats</em>
 </p>
 
-## Installation des librairies pour "TNI"
+## Installation des librairies
+Pour utiliser les codes sources ou tester les programmes, il faut installer les librairies suivantes : 
 
-
-###### xtl : 
- 
+###### xtl :
   * Download zip from : https://github.com/xtensor-stack/xtl
  
   * Extract files and open a terminal in the extracted folder : 
@@ -39,7 +38,6 @@ Voici deux démonstration des résultats obtenus :
 
 
 ###### xtensor : 
- 
   * Download zip from : https://github.com/xtensor-stack/xtensor
  
   * Extract files and open a terminal in the extracted folder : 
@@ -53,7 +51,6 @@ Voici deux démonstration des résultats obtenus :
   ```
 
 ###### xtensor-blas : 
- 
   * Download zip from : https://github.com/xtensor-stack/xtensor-blas
  
   * Extract files and open a terminal in the extracted folder : 
@@ -66,25 +63,57 @@ Voici deux démonstration des résultats obtenus :
   ```
 
 
-###### openBlas : 
-
+###### openBlas :
   ```
     $ sudo apt-get install libopenblas-dev
   ```
 
-## Lane detection
+###### ROS PID : 
+  ```
+    $ sudo apt-get install ros-melodic-pid
+  ```
 
+## Usage
+Afin de lancer le simulateur, il faut suivre les étapes suivantes :
+
+###### Téléchargements :
+1. Télécharger ce dépôt git :
+  ```bash
+    $ git clone https://github.com/HamidHacene/laCJC_ROS.git
+  ```
+2. Télécharger *V-REP* : https://coppeliarobotics.com/downloads
+
+###### Lancement des programmes :
+ 
+  * Lancer *ROS* :
+  ```bash
+    $ roscore
+  ```
+  * Lancer *V-REP* : (dans le dossier téléchargé précédemment)
+  ```bash
+    $ ./vrep.sh
+  ```
+  * Ouvrir la scène `laCJC_ROS/vrep_simulation/seance4_modele_realiste_et_piste.ttt` dans *V-REP*
+  * Compiler les sources (sans oublier de faire un source avec `devel/setup.bash`): 
+  ```bash
+    $ cd laCJC_ROS/ROS_package
+    $ catkin_make
+  ```
+  * Dans un autre terminal, lancer *rqt*
+  ```bash
+    $ rqt
+  ```
+  * Une fois la simulation sour *V-REP* lancé (bouton play) :
+  ```bash
+    $ roslaunch waypoints_follow vrep_launch.launch
+  ```
+  * Une fenêtre ressemblant à l'image ci-dessous doit apparaître :  
 <p align="center">
-    <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/Lane_Detection/data/virageG.png"> <br>
-    <em>Raw image</em>
+    <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/Lane_Detection/data/visual.png" width="600" height="400"> <br>
+    <em>Visualisation du traitement</em>
 </p>
-
+  * Il reste qu'à contrôler la vitesse d'avance et les coefficients du *PID* avec *rqt*
 <p align="center">
-    <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/Lane_Detection/data/BEV.png"> <br>
-    <em>Bird Eye View</em>
-</p>
-
-<p align="center">
-    <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/Lane_Detection/data/fit.png"> <br>
-    <em>Polynomial fit</em>
+    <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/Lane_Detection/data/inter_ctrl.png" width="600" height="400"> <br>
+    <em>Contrôle avec *rqt*</em>
 </p>
