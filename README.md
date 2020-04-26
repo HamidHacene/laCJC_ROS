@@ -112,8 +112,9 @@ Afin de lancer le simulateur, il faut suivre les étapes suivantes :
     <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/Lane_Detection/data/visual.png" width="600" height="250"> <br>
     <em>Visualisation du traitement</em>
 </p>
-  * Il reste qu'à contrôler la vitesse d'avance et les coefficients du *PID* avec *rqt*
+
+  * Il reste qu'à contrôler la vitesse d'avance et les coefficients du *PID* avec *rqt* :
 <p align="center">
-    <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/docs/rapport_final/imgs/inter_ctrl.png" width="600" height="400"> <br>
+    <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/docs/rapport_final/imgs/inter_ctrl.png" width="700" height="250"> <br>
     <em>Contrôle avec *rqt*</em>
 </p>
