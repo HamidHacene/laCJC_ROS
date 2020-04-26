@@ -103,17 +103,17 @@ Afin de lancer le simulateur, il faut suivre les étapes suivantes :
   ```bash
     $ rqt
   ```
-  * Une fois la simulation sour *V-REP* lancé (bouton play) :
+  * Une fois la simulation sour *V-REP* lancé (bouton play), saisir  cette instruction dans un terminal : 
   ```bash
     $ roslaunch waypoints_follow vrep_launch.launch
   ```
   * Une fenêtre ressemblant à l'image ci-dessous doit apparaître :  
 <p align="center">
-    <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/Lane_Detection/data/visual.png" width="600" height="400"> <br>
+    <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/Lane_Detection/data/visual.png" width="600" height="250"> <br>
     <em>Visualisation du traitement</em>
 </p>
   * Il reste qu'à contrôler la vitesse d'avance et les coefficients du *PID* avec *rqt*
 <p align="center">
-    <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/Lane_Detection/data/inter_ctrl.png" width="600" height="400"> <br>
+    <img src="https://github.com/HamidHacene/laCJC_ROS/blob/master/docs/rapport_final/imgs/inter_ctrl.png" width="600" height="400"> <br>
     <em>Contrôle avec *rqt*</em>
 </p>
